@@ -1,0 +1,55 @@
+### **1. `emplace_back()` vs. `push_back()`**  
+- **`push_back()`**  
+  - Inserts an element at the end.  
+  - Creates a temporary object and moves/copies it.  
+  - Example: `vec.push_back(MyClass(10));`  
+- **`emplace_back()`**  
+  - Directly constructs the element in place (avoids extra move/copy).  
+  - More efficient for complex objects.  
+  - Example: `vec.emplace_back(10);`  
+
+
+### **2. `deque` vs. `dequeue`**  
+- **`deque` (Double-ended Queue)** → A C++ STL container for efficient insertions/removals at both ends.  
+- **`dequeue`** → Incorrect spelling; does not exist in C++.  
+
+
+### **3. `vector` vs. `list` vs. `deque` (Key Differences)**  
+- **Memory Layout:**  
+  - `vector` → Continuous  
+  - `list` → Non-contiguous (linked list)  
+  - `deque` → Chunks (blocks)  
+- **Insertion/Deletion Speed:**  
+  - `vector` → Fast at the end, slow in the middle  
+  - `list` → Fast anywhere  
+  - `deque` → Fast at both ends  
+- **Random Access:**  
+  - `vector` → O(1) (fast)  
+  - `list` → O(n) (slow)  
+  - `deque` → O(1) (fast)  
+- **Cache Efficiency:**  
+  - `vector` → High (better memory locality)  
+  - `list` → Low (pointers cause poor locality)  
+  - `deque` → Moderate  
+- **Best Use Cases:**  
+  - `vector` → When frequent access/modifications are at the end.  
+  - `list` → When frequent insertions/deletions occur anywhere.  
+  - `deque` → When frequent insertions/deletions happen at both ends.  
+
+### **4. Queue vs. Priority Queue (Key Differences)**  
+
+- **Ordering of Elements:**  
+  - **Queue:** Follows **FIFO (First In, First Out)** order.  
+  - **Priority Queue:** Elements are **sorted based on priority** (default: largest element first).  
+
+- **Insertion & Removal:**  
+  - **Queue:** Inserts at the back, removes from the front.  
+  - **Priority Queue:** Inserts normally, but **removes the highest priority element first**.  
+
+- **Access Complexity:**  
+  - **Queue:** `O(1)` for insertion & deletion.  
+  - **Priority Queue:** `O(log n)` for insertion & deletion (internally uses a heap).  
+
+- **Use Cases:**  
+  - **Queue:** Task scheduling, buffering, BFS in graphs.  
+  - **Priority Queue:** Dijkstra’s Algorithm, Huffman coding, task scheduling with priorities.  
