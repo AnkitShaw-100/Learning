@@ -53,3 +53,39 @@
 - **Use Cases:**  
   - **Queue:** Task scheduling, buffering, BFS in graphs.  
   - **Priority Queue:** Dijkstra’s Algorithm, Huffman coding, task scheduling with priorities.  
+
+
+### ✅ **Map vs. Ordered Map vs. Unordered Map**
+
+- **`map` / `ordered map`:**  
+  - Stores **key-value** pairs in **sorted (ascending)** order of keys.  
+  - Implemented using **Red-Black Tree (balanced BST)**.  
+  - **Time Complexity:** O(log n) for insertion, deletion, access.  
+
+- **`unordered_map`:**  
+  - Stores key-value pairs in **no specific order**.  
+  - Implemented using **Hash Table**.  
+  - **Time Complexity:** O(1) average for insertion, deletion, access.  
+
+- **Key Differences:**  
+  - `map` maintains **sorted keys**, `unordered_map` does **not**.  
+  - `map` is **slower** due to tree structure; `unordered_map` is **faster** (on average).  
+
+---
+
+### ✅ **Set vs. Ordered Set vs. Unordered Set**
+
+- **`set` / `ordered set`:**  
+  - Stores **unique elements** in **sorted order**.  
+  - Implemented using **Red-Black Tree**.  
+  - **Time Complexity:** O(log n).  
+
+- **`unordered_set`:**  
+  - Stores **unique elements** in **no particular order**.  
+  - Implemented using **Hash Table**.  
+  - **Time Complexity:** O(1) average.  
+
+- **Key Differences:**  
+  - `set` maintains **order**, `unordered_set` does **not**.  
+  - `set` is good when **sorted data** is required; `unordered_set` is **faster** for simple lookups.  
+
