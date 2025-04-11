@@ -86,7 +86,7 @@ const ReportPage = () => {
                 {/* Buttons */}
                 <div className="flex justify-center gap-6">
                     <button className="bg-yellow-400 text-black px-8 py-3 rounded-xl shadow-lg font-semibold transform hover:scale-105 transition duration-300 hover:shadow-xl"
-                        onClick={() => navigate("")}
+                        onClick={() => navigate("/lostitemform")}
                     >
                         Add Report
                     </button>
