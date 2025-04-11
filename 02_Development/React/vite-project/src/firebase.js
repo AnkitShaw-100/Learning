@@ -1,18 +1,20 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyArx2GDQqtZdHtdyGznY6FGWowDilzOgTc",
+  authDomain: "fir-basics-e5f57.firebaseapp.com",
+  projectId: "fir-basics-e5f57",
   storageBucket: "fir-basics-e5f57.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  messagingSenderId: "112599554485",
+  appId: "1:112599554485:web:502de6e359cfd7120761fc",
+  measurementId: "G-JB6WRSK09V"
 };
 
 const app = initializeApp(firebaseConfig);
-const database = getFirestore(app);
-const storage = getStorage(app);
 
-export { database, storage };
+export const auth = getAuth(app);
+export const database = getFirestore(app);
+export const storage = getStorage(app);

@@ -108,126 +108,16 @@ function UserForm() {
 
 export default UserForm; */
 
-// UserFormWithPhoto.js
-import { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
-import { database } from './firebase'; // Removed Firebase Storage
+import React, { useState } from 'react';
+import ImageUpload from './component/ImageUpload';
 
-function UserFormWithPhoto() {
-  const [data, setData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    phone: '',
-  });
-  const [file, setFile] = useState(null);
-
-  const collectionRef = collection(database, 'users');
-
-  const handleInput = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  // ✅ Cloudinary upload function
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'my_unsigned_preset'); // ✅ Your unsigned preset
-    formData.append('cloud_name', 'your_cloud_name'); // 🔁 Replace with actual Cloudinary cloud name
-
-    try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await res.json();
-      console.log("Cloudinary URL:", data.secure_url);
-      return data.secure_url;
-    } catch (error) {
-      console.error("Cloudinary upload failed:", error.message);
-      alert("Image upload failed.");
-      return null;
-    }
-  };
-
-  const handleSubmit = async () => {
-    const { fullName, email, password, phone } = data;
-
-    if (!fullName || !email || !password) {
-      alert("Please fill required fields.");
-      return;
-    }
-
-    try {
-      let photoURL = "No file uploaded";
-      if (file) {
-        photoURL = await uploadToCloudinary(file);
-        if (!photoURL) return; // Exit if upload failed
-      }
-
-      await addDoc(collectionRef, {
-        fullName,
-        email,
-        password,
-        phone,
-        photoURL,
-        createdAt: new Date(),
-      });
-
-      alert("User data saved with photo!");
-      setData({ fullName: '', email: '', password: '', phone: '' });
-      setFile(null);
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  };
-
+function App() {
   return (
-    <div>
-      <h2>Register User with Photo</h2>
+    <>
+    <ImageUpload/>
+    </>
 
-      <input name="fullName" placeholder="Full Name" value={data.fullName} onChange={handleInput} />
-      <input name="email" placeholder="Email" value={data.email} onChange={handleInput} />
-      <input type="password" name="password" placeholder="Password" value={data.password} onChange={handleInput} />
-      <input name="phone" placeholder="Phone" value={data.phone} onChange={handleInput} />
-
-      <input type="file" onChange={handleFileChange} />
-      {file && <p>Selected: {file.name}</p>}
-
-      <button onClick={handleSubmit}>Submit</button>
-    </div>
   );
 }
 
-export default UserFormWithPhoto;
-
-
-
-// Optimize and Transform Cloudinary
-// import React from 'react'
-// import { Cloudinary } from '@cloudinary/url-gen';
-// import { auto } from '@cloudinary/url-gen/actions/resize';
-// import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
-// import { AdvancedImage } from '@cloudinary/react';
-
-// const App = () => {
-//   const cld = new Cloudinary({ cloud: { cloudName: 'dgncmahiz' } });
-  
-//   // Use this sample image or upload your own via the Media Explorer
-//   const img = cld
-//         .image('cld-sample-5')
-//         .format('auto') // Optimize delivery by resizing and applying auto-format and auto-quality
-//         .quality('auto')
-//         .resize(auto().gravity(autoGravity()).width(500).height(500)); // Transform the image: auto-crop to square aspect_ratio
-
-//   return (<AdvancedImage cldImg={img}/>);
-// };
-
-// export default App
+export default App;
