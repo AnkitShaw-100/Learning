@@ -1,0 +1,28 @@
+# ✅ Dependencies installation script
+
+# Tailwind plugin for Vite
+npm install @tailwindcss/vite
+
+# Bootstrap CSS framework
+npm install bootstrap
+
+# Firebase SDK
+npm install firebase
+
+# React core library
+npm install react
+
+# React DOM for rendering
+npm install react-dom
+
+# React Icons
+npm install react-icons
+
+# React Router DOM
+npm install react-router-dom
+
+# Tailwind CSS framework
+npm install tailwindcss
+
+# Framer Motion for animations
+npm install framer-motion
