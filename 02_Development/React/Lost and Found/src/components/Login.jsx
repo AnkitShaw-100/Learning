@@ -11,7 +11,6 @@ const LoginPage = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    // Simulate login process
     console.log({ email, password });
 
     setTimeout(() => {
@@ -22,14 +21,12 @@ const LoginPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {/* Fade-in animation */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.7 }}
         className="w-full max-w-sm bg-white rounded-lg shadow-md p-8 text-center"
       >
-        {/* Scale animation */}
         <motion.img
           src={Logo}
           alt="Logo"
@@ -48,7 +45,6 @@ const LoginPage = () => {
           Login
         </motion.h2>
 
-        {/* Input fields with slide-in animation */}
         <motion.div
           className="flex flex-col text-left mb-4"
           initial={{ x: -50, opacity: 0 }}
@@ -81,7 +77,6 @@ const LoginPage = () => {
           />
         </motion.div>
 
-        {/* Submit button with hover animation */}
         <motion.button
           type="submit"
           onClick={handleSubmit}
@@ -93,7 +88,6 @@ const LoginPage = () => {
           {submitting ? "Logging in..." : "Login"}
         </motion.button>
 
-        {/* Sign-up link with fade-in animation */}
         <motion.p
           className="mt-4 text-sm text-gray-600"
           initial={{ opacity: 0 }}

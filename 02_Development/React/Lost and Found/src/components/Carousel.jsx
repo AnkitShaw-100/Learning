@@ -60,7 +60,6 @@ const TailwindCarousel = () => {
           />
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
         <button
           onClick={prevSlide}
           className="absolute top-1/2 left-5 transform -translate-y-1/2 bg-white/80 hover:bg-white text-black p-3 rounded-full shadow transition duration-300"
@@ -79,4 +78,3 @@ const TailwindCarousel = () => {
 };
 
 export default TailwindCarousel;
-

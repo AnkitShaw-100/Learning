@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ReportCard from "../components/ReportCard";
 import Logo from "../assets/logo.png";
+import Navbar from "./Navbar";
 
 const fakeReports = [
     {
@@ -58,55 +59,55 @@ const fakeReports = [
         time: "2:00 PM",
         date: "2024-04-02",
         holder: "Reception",
-    }
+    },
 ];
 
 const ReportPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen px-6 py-10 bg-gray-100">
-            <div className="flex items-center justify-center gap-4 mb-10">
-                <motion.img
-                    src={Logo}
-                    alt="Found It Logo"
-                    className="w-14 h-14"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: [1, 1.2, 1], opacity: 1 }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 4 }}
-                />
-                <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-                    Reported Items
-                </h1>
-            </div>
+        <>
+            {/* Header */}
+            <Navbar />
+            <div className="min-h-screen px-6 py-10 bg-gray-100 mt-16">
+                <div className="flex items-center justify-center gap-4 mb-10">
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                        Reported Items
+                    </h1>
+                </div>
 
+                {/* Reports Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center mb-12">
+                    {fakeReports.map((report, index) => (
+                        <ReportCard key={index} report={report} />
+                    ))}
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center mb-12">
-                {fakeReports.map((report, index) => (
-                    <ReportCard key={index} report={report} />
-                ))}
-            </div>
+                {/* Buttons */}
+                <div className="flex justify-center gap-6">
+                    <button className="bg-yellow-400 text-black px-8 py-3 rounded-xl shadow-lg font-semibold transform hover:scale-105 transition duration-300 hover:shadow-xl"
+                        onClick={() => navigate("")}
+                    >
+                        Add Report
+                    </button>
+                    <button
+                        className="bg-yellow-400 hover:bg-yellow-500 transition text-black font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 duration-300"
+                        onClick={() => navigate("/")}
+                    >
+                        Back to Home
+                    </button>
+                </div>
 
-            <div className="flex justify-center gap-6">
-                <button className="bg-yellow-400 text-black px-8 py-3 rounded-xl shadow-lg font-semibold transform hover:scale-105 transition duration-300 hover:shadow-xl">
-                    Add Report
-                </button>
-                <button
-                    className="bg-yellow-400 hover:bg-yellow-500 transition text-black font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 duration-300"
-                    onClick={() => navigate("/")}
+                {/* Footer */}
+                <motion.footer
+                    className="max-w-4xl mx-auto mt-16 text-center text-gray-600 text-sm"
+                    initial="hidden"
+                    animate="visible"
                 >
-                    Back to Home
-                </button>
+                    Powered by College X • Built to reward honesty and responsibility © 2025
+                </motion.footer>
             </div>
-
-            <motion.footer
-                className="max-w-4xl mx-auto mt-16 text-center text-gray-600 text-sm"
-                initial="hidden"
-                animate="visible"
-            >
-                Powered by College X • Built to reward honesty and responsibility © 2025</motion.footer>
-
-        </div>
+        </>
     );
 };
 

@@ -1,16 +1,16 @@
 import React from "react";
 
 const ReportCard = ({ report }) => {
-return (
+  return (
     <div className="bg-white rounded-xl shadow-md p-4 w-[320px] h-[350px] hover:scale-105 transition-transform">
-        {/* Image section */}
+      {/* Image Section */}
       <img
-        src={report.image || "/placeholder.png"} // Update this path based on your assets
+        src={report.image || "/placeholder.png"}
         alt={report.product || "Lost item"}
         className="h-[200px] w-full object-cover rounded mb-4"
       />
 
-      {/* Info section */}
+      {/* Info Section */}
       <p className="text-sm text-gray-800 font-semibold">
         {report.product} - {report.category}
       </p>
