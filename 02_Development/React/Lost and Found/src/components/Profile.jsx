@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import Logo from "../assets/logo.png";
 
 const ProfilePage = () => {
@@ -149,17 +149,16 @@ const ProfilePage = () => {
               {["H1", "H2", "H3", "H4", "H5"].map((hostelOption, index) => (
                 <motion.label
                   key={index}
-                  className={`flex items-center space-x-2 px-3 py-1 rounded-lg ${
-                    hostelOption === "H1"
+                  className={`flex items-center space-x-2 px-3 py-1 rounded-lg ${hostelOption === "H1"
                       ? "bg-yellow-100"
                       : hostelOption === "H2"
-                      ? "bg-blue-100"
-                      : hostelOption === "H3"
-                      ? "bg-green-100"
-                      : hostelOption === "H4"
-                      ? "bg-purple-100"
-                      : "bg-red-100"
-                  }`}
+                        ? "bg-blue-100"
+                        : hostelOption === "H3"
+                          ? "bg-green-100"
+                          : hostelOption === "H4"
+                            ? "bg-purple-100"
+                            : "bg-red-100"
+                    }`}
                   whileHover={{ scale: 1.1 }} // Slight hover effect
                 >
                   <input
@@ -168,17 +167,16 @@ const ProfilePage = () => {
                     value={hostelOption}
                     checked={hostel === hostelOption}
                     onChange={(e) => setHostel(e.target.value)}
-                    className={`form-radio ${
-                      hostelOption === "H1"
+                    className={`form-radio ${hostelOption === "H1"
                         ? "text-yellow-500"
                         : hostelOption === "H2"
-                        ? "text-blue-500"
-                        : hostelOption === "H3"
-                        ? "text-green-500"
-                        : hostelOption === "H4"
-                        ? "text-purple-500"
-                        : "text-red-500"
-                    }`}
+                          ? "text-blue-500"
+                          : hostelOption === "H3"
+                            ? "text-green-500"
+                            : hostelOption === "H4"
+                              ? "text-purple-500"
+                              : "text-red-500"
+                      }`}
                   />
                   <span className="font-medium">{hostelOption}</span>
                 </motion.label>

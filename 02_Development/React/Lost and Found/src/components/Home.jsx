@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import Logo from "../assets/logo.png";
+import Carousel from "./Carousel";
+
 
 const HomePage = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -26,8 +28,8 @@ const HomePage = () => {
                             <Link to="/" className="flex items-center space-x-3">
                                 <motion.div
                                     className="w-12 h-12 flex items-center justify-center"
-                                    whileHover={{ scale: 1.05 }} 
-                                    whileTap={{ scale: 0.95 }} 
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                 >
                                     <img
                                         src={Logo}
@@ -59,7 +61,7 @@ const HomePage = () => {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <Link
-                                    to="/report"
+                                    to="/reportpage"
                                     className="text-gray-700 hover:text-gray-900 font-medium px-3 py-2"
                                 >
                                     Report
@@ -185,6 +187,63 @@ const HomePage = () => {
                     </div>
                 </div>
             </nav>
+
+            <Carousel />
+
+            {/* Slogan or Brief Idea */}
+            <div className="max-w-4xl mx-auto text-center mt-16 px-4">
+                <div className="bg-yellow-400 text-gray-900 p-8 rounded-2xl shadow-lg">
+                    <h2 className="text-3xl font-bold mb-3">Your Campus Lost & Found Partner</h2>
+                    <p className="text-lg">
+                        FoundIt helps you easily report, find, and track lost items in your campus community.
+                    </p>
+                </div>
+            </div>
+
+            {/* Three Cards Section */}
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 px-4">
+                {/* Lost */}
+                <div
+                    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition duration-300 cursor-pointer border border-yellow-300"
+                    onClick={() => window.location.href = "/lostform"}
+                >
+                    <h3 className="text-2xl font-semibold text-yellow-500 mb-3">Lost</h3>
+                    <p className="text-gray-600 text-base leading-relaxed">
+                        Where? When? <br />
+                        (Opens a form to collect details)
+                    </p>
+                </div>
+
+                {/* Report */}
+                <div
+                    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition duration-300 cursor-pointer border border-yellow-300"
+                    onClick={() => window.location.href = "/reportpage"}
+                >
+                    <h3 className="text-2xl font-semibold text-yellow-500 mb-3">Report</h3>
+                    <p className="text-gray-600 text-base leading-relaxed">
+                        View reports of lost and found items submitted by users.
+                    </p>
+                </div>
+
+                {/* Found */}
+                <div
+                    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition duration-300 cursor-pointer border border-yellow-300"
+                    onClick={() => alert("Total found count: 42")}
+                >
+                    <h3 className="text-2xl font-semibold text-yellow-500 mb-3">Found</h3>
+                    <p className="text-gray-600 text-base leading-relaxed">
+                        See how many successful recoveries have been made through this platform.
+                    </p>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <footer className="mt-20 bg-gray-900 text-gray-100 text-center py-6 rounded-t-2xl shadow-inner">
+                &copy; {new Date().getFullYear()} <span className="font-semibold">FoundIt</span>. All rights reserved.
+            </footer>
+
+
+
         </motion.div>
     );
 };
