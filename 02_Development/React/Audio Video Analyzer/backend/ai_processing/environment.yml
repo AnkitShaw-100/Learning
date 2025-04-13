@@ -1,0 +1,19 @@
+name: audio-video-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - librosa
+  - moviepy
+  - opencv
+  - pydub
+  - ffmpeg
+  - transformers
+  - speechrecognition
+  - flask
+  - flask-cors
+  - pip:
+      - torch  # Needed by transformers
