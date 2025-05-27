@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial";
+}
+
+#parent {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#main_box {
+  width: 60%;
+  height: 80vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  position: absolute; /* ✅ Required for left-based positioning */
+  transition: transform 1s ease; /* ✅ Smooth sliding */
+  object-fit: cover;
+  border-radius: 10px;
+  border: 5px dashed rgb(158, 158, 158);
+}
+
+#buttons {
+  margin-top: 20px;
+  gap: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#button1 {
+  background-color: rgb(19, 214, 19);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#button2 {
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
