@@ -612,4 +612,3 @@ const usersWhoCommented = comments.map(comment => comment.userId);
 const usersWhoDidNotComment = users.filter(user => !usersWhoCommented.includes(user.id));
 
 console.log(usersWhoDidNotComment);
-
