@@ -237,7 +237,6 @@ console.log(replaceFristDigit("AN"));
 
 
 // 14. Write a Js program to compare 2 objects to determine is the first one conatains the same properties as the second one(which may also have additional properties)
-
 /* 
 my code(error)
 function compareObj(obj1, obj2){
@@ -285,7 +284,6 @@ console.log(compareObj(obj1, obj2));
 
 
 // 15. Write a JS program to convert a comma-seperated values (CSV) string to a 2D array. A new line indicates a new row in the array.
-
 function csvToArray(csv) {
     const rows = csv.trim().split('\n');           // Split by newline
     return rows.map(row => row.split(','));        // Split each row by comma
@@ -327,3 +325,291 @@ function codeGenerator() {
 }
 
 console.log(codeGenerator());
+
+
+
+// 17. Write a JS function that returns a passed string with letters in alphabetical order. Example string : "webmaster" expected output : "abemrstw"
+/* 
+my code (error)
+function alphabeticalOrder(str){
+    var min = 0;
+    var arr2 = [];
+    for(var i = 0; i < str.length; i++){
+        if(str.charCodeAt(i) > str.charCodeAt(min));
+            arr2 = str(i); 
+    }
+    return arr2;
+}
+console.log(alphabeticalOrder("aksjksjksn"));
+*/
+
+function alphabeticalOrder(str) {
+    return str.split('').sort().join('');
+}
+
+console.log(alphabeticalOrder("aksjksjksn")); // Output: "aijkkkkknss"
+
+
+
+// 18. Write a JS function that accepts a string as a parameter and counts the number of vowels within the string.
+const countVowels = (str) => {
+    var temp = str.split('');
+    var count = 0;
+    for (var i = 0; i < str.length; i++) {
+        if (temp[i] === 'a' || temp[i] === 'A' || temp[i] === 'e' || temp[i] === 'E' || temp[i] === 'i' || temp[i] === 'I' || temp[i] === 'o' || temp[i] === 'O' || temp[i] === 'u' || temp[i] === 'U')
+            count++;
+    }
+    return count;
+}
+
+console.log(countVowels("Anit"));
+
+
+
+// 19. Write a Js function to convert and amount to coins. Possile coins given are 25,10,5,2,1
+function coins(num) {
+    var count25 = 0;
+    var count10 = 0;
+    var count5 = 0;
+    var count2 = 0;
+    var count1 = 0;
+
+    if (num > 25) {
+        num -= 25;
+        count25++;
+    }
+    else if (num < 25 && num > 10) {
+        num -= 10;
+        count10++;
+    }
+    else if (num < 10 && num > 5) {
+        num -= 5;
+        count5++;
+    }
+
+    else if (num < 5 && num > 2) {
+        num -= 2;
+        count2++;
+    }
+    else {
+        num -= 1;
+        count1++;
+    }
+    console.log("we got 25's coin : ", count25);
+    console.log("we got 10's coin : ", count10);
+    console.log("we got 5's coin : ", count5);
+    console.log("we got 2's coin : ", count2);
+    console.log("we got 1's coin : ", count1);
+
+}
+coins(118);
+
+
+
+
+const people = [
+    { firstName: 'Sam', lastName: 'Hughes', DOB: '07/07/1978', department: 'Development', salary: '45000' },
+    { firstName: 'Terri', lastName: 'Bishop', DOB: '02/04/1989', department: 'Development', salary: '35000' },
+    { firstName: 'Jar', lastName: 'Burke', DOB: '11/01/1985', department: 'Marketing', salary: '38000' },
+    { firstName: 'Julio', lastName: 'Miller', DOB: '12/07/1991', department: 'Sales', salary: '40000' },
+    { firstName: 'Chester', lastName: 'Flores', DOB: '03/15/1988', department: 'Development', salary: '41000' },
+    { firstName: 'Madison', lastName: 'Marshall', DOB: '09/22/1980', department: 'Sales', salary: '32000' },
+    { firstName: 'Ava', lastName: 'Pena', DOB: '11/02/1986', department: 'Development', salary: '38000' },
+    { firstName: 'Gabriella', lastName: 'Steward', DOB: '08/26/1994', department: 'Marketing', salary: '46000' },
+    { firstName: 'Charles', lastName: 'Campbell', DOB: '09/04/1977', department: 'Sales', salary: '42000' },
+    { firstName: 'Tiffany', lastName: 'Lambert', DOB: '05/11/1990', department: 'Development', salary: '34000' },
+    { firstName: 'Antonio', lastName: 'Gonzalez', DOB: '03/24/1985', department: 'Office Management', salary: '49000' },
+    { firstName: 'Aaron', lastName: 'Garrett', DOB: '09/04/2005', department: 'Development', salary: '39000' }
+];
+
+
+// 20. What is the average income of all the people in teh array ? 
+// 21. Who are the people that are currently older than 30 ?
+// 22. Print firstname and lastname of person in array?
+
+// 20.
+const totalIncome = people.reduce((sum, person) => sum + parseInt(person.salary), 0);
+const averageIncome = totalIncome / people.length;
+console.log("Average income is: ₹" + averageIncome.toFixed(2));
+
+/*
+my code (error)
+const age = people.reduce((person) => 
+    parseInt(person.age);
+    var count = 0;
+    if(age > 30){
+        count++;
+    });
+console.log(count);
+*/
+
+// 21.
+people.filter(person => new Date().getFullYear() - new Date(person.DOB).getFullYear() > 30)
+people.forEach(person => {
+    console.log(`${person.firstName} ${person.lastName}`);
+});
+
+// 22.
+people.sort((personA, personB) => new Date(personA.DOB) - new Date(personB.DOB));
+people.forEach(person => {
+    console.log(`${person.firstName} ${person.lastName} - ${person.DOB}`);
+});
+
+
+
+const orders = [
+    { orderId: '123', customerId: '123', deliveryDate: '01-01-2020', delivered: true, items: [{ productId: '123', price: 55 }, { productId: '234', price: 30 },] },
+    { orderId: '234', customerId: '234', deliveryDate: '01-02-2020', delivered: false, items: [{ productId: '234', price: 30 },] },
+    { orderId: "345", customerId: '234', deliveryDate: '05-01-2020', delivered: true, items: [{ productId: '567', price: 30 }, { productId: '678', price: 80 },] },
+    { orderId: '456', customerId: '345', deliveryDate: '12-01-2020', delivered: true, items: [{ productId: '789', price: 12 }, { productId: '890', price: 90 },] },
+    { orderId: '578', customerId: '456', deliveryDate: '12-01-2020', delivered: true, items: [{ productId: '901', price: 43 }, { productId: '123', price: 55 },] }
+];
+
+// 23. Get a list of the orders for the customer with the Id 234 that have not been not been delivered.  
+// 24. Create a new property on each order with the total piece of items ordered.
+// 25. Have all orders been deliverd ?
+// 26. Has the coustomer with Id '123' made nay order?
+// 27. Have any products with an Id 123 been sold
+
+// 23.
+/*
+my code(error)
+const getProducts = () => {
+    orders.filter(person) => {
+        if(person.customerId === '234')
+            console.log(person.items);
+    }
+}
+*/
+const getProducts = () => {
+    return orders.filter(order => order.customerId === '234');
+}
+console.log(getProducts());
+
+// 24.
+const newProp = () => {
+    orders.forEach(order => { order.totalItems = order.items.length })
+    return orders;
+}
+console.log(newProp());
+// 25.
+const checkDelivery = () => {
+    return orders.filter(order => order.delivered === true)
+}
+console.log(checkDelivery());
+// 26.
+const checkOrder = () => {
+    const e = orders.filter(order => order.customerId === '123' && order.delivered === true)
+    return e.length > 0;
+}
+console.log(checkOrder());
+// 27.
+
+/*
+my code (error)
+const checkProduct = () =>{
+    const e = orders.filter(order => order.productId === '123');
+    return e.length > 0; 
+} 
+*/
+
+const checkProduct = () => {
+    return orders.some(order =>
+        order.items.some(item => item.productId === '123')
+    );
+};
+
+console.log(checkProduct());
+
+
+
+const users = [
+    { id: '88f24bea-3825-4237-a0d1-efb6b92d37a4', firstName: 'Sam', lastName: 'Hughes' },
+    { id: '2a35032d-e02b-4508-b3b5-6393aff75a53', firstName: 'Terri', lastName: 'Bishop' },
+    { id: '7f053852-7440-4e44-838c-ddac24611050', firstName: 'Jar', lastName: 'Burke' },
+    { id: 'd456e3af-596a-4224-b1dc-dd990a34c9cf', firstName: 'Julio', lastName: 'Miller' },
+    { id: '58a1e37b-4b15-47c1-b95b-11fe016f7b64', firstName: 'Chester', lastName: 'Flores' },
+    { id: 'b4a306cb-8b95-4f85-b9f8-434dbe010985', firstName: 'Madison', lastName: 'Marshall' },
+    { id: '6ee904be-e3b0-41c9-b7a2-5a0233c38e4c', firstName: 'Ava', lastName: 'Pena' },
+    { id: '7f0ce45a-bdca-4067-968b-d908e79276ce', firstName: 'Gabriella', lastName: 'Steward' },
+    { id: '9e525c2d-6fcd-4d88-9ac4-a44eaf3a43e6', firstName: 'Charles', lastName: 'Campbell' },
+    { id: 'e789565f-fa5a-4d5e-8f6c-dd126cf995be', firstName: 'Madison', lastName: 'Lambert' },
+];
+
+const comments = [
+    { userId: '88f24bea-3825-4237-a0d1-efb6b92d37a4', text: 'Great Job!' },
+    { userId: '7f053852-7440-4e44-838c-ddac24611050', text: 'Well done, I think I understand now!' },
+    { userId: 'e789565f-fa5a-4d5e-8f6c-dd126cf995be', text: 'How do you do that? 😲' },
+    { userId: '7f053852-7440-4e44-838c-ddac24611050', text: 'OK great thanks' },
+    { userId: 'b4a306cb-8b95-4f85-b9f8-434dbe010985', text: 'Cool, thanks!' },
+    { userId: '9e525c2d-6fcd-4d88-9ac4-a44eaf3a43e6', text: 'Nice one 😉' },
+    { userId: '6ee904be-e3b0-41c9-b7a2-5a0233c38e4c', text: 'Got it.' },
+    { userId: '9e525c2d-6fcd-4d88-9ac4-a44eaf3a43e6', text: 'Thanks!' },
+    { userId: '58a1e37b-4b15-47c1-b95b-11fe016f7b64', text: 'Cool 😀' },
+    { userId: '6ee904be-e3b0-41c9-b7a2-5a0233c38e4c', text: 'Great stuff!' },
+];
+
+// 28. What is Madison Marshall's user id?
+// 29. Who wrote the first comment (assuming the first comment is in position 0 of the comments array)
+// 30. Which user commented 'OK great thanks'?
+// 31. Add the user's first and last name to each comment in the comments array
+// 32. Get a list of the users who haven't commented
+
+// 28.
+const userPos = () => {
+    return users.findIndex(person => person.firstName === 'Madison' && person.lastName === 'Marshall');
+} 
+// console.log(userPos());
+
+var position = userPos();
+const getuserId = () => {
+    return comments[position].userId;
+}
+console.log(getuserId());
+
+
+
+// 29.
+const firstCommentuserID = () => {
+    return comments[0].userId;
+}
+// console.log(firstCommentuserID());
+
+var user = firstCommentuserID();
+const gettingUser = () => {
+    var index = users.findIndex(person => person.id === user); 
+    return users[index].firstName + " " +users[index].lastName; 
+}
+console.log(gettingUser());
+
+
+
+// 30.
+const getUserWhoCommented = () => {
+    return comments.findIndex(comment => comment.text === 'OK great thanks');
+}
+
+var index = getUserWhoCommented();
+const getUser = () =>{
+    return users[index].firstName+ " " + users[index].lastName;
+}
+console.log(getUser());
+
+// 31.
+const commentsWithUserNames = comments.map(comment => {
+    const user = users.find(user => user.id === comment.userId);
+    return {
+        ...comment,
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || ''
+    };
+});
+
+console.log(commentsWithUserNames);
+
+// 32.
+const usersWhoCommented = comments.map(comment => comment.userId);
+const usersWhoDidNotComment = users.filter(user => !usersWhoCommented.includes(user.id));
+
+console.log(usersWhoDidNotComment);
+
