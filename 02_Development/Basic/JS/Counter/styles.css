@@ -1,0 +1,37 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI';
+}
+
+#main{
+    gap: 30px;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#buttons{
+    gap: 20px;
+    display: flex;
+}
+
+#button1{
+    border:  none;
+    height: 2.5rem;
+    width: 3rem;
+    background-color: rgb(65, 255, 18);
+    border-radius: 10px;
+    color: white;
+}
+
+#button2{
+    border:  none;
+    height: 2.5rem;
+    width: 3rem;
+    background-color: red;
+    border-radius: 10px;
+    color: white;
+}
