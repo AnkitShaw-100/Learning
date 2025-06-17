@@ -1,0 +1,6 @@
+ 1. setCharAt(idx,ch)
+ 2. append(ch)
+ 3. insert(idx,ch)
+ 4. deleteCharAt(ch)
+ 5. reverse()
+ 6. delete()
