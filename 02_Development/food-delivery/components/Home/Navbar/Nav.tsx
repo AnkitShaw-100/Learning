@@ -48,7 +48,7 @@ const Nav = ({ openNavbar }: Props) => {
               <Link
                 key={link.id}
                 href={link.url}
-                className="text-black dark:text-white hover:text-green-700 dark:hover:text-green-400 font-bold transition-all duration-200"
+                className="text-black dark:text-white hover:text-green-700 dark:hover:text-amber-300 font-bold transition-all duration-200"
               >
                 <p>{link.label}</p>
               </Link>
@@ -58,7 +58,7 @@ const Nav = ({ openNavbar }: Props) => {
         {/* Button */}
         <div className="flex items-center space-x-4">
           {/* Join Now button */}
-          <button className="bg-blue-950 dark:bg-white dark:text-black dark:hover:bg-grey-200 px-8 py-2.5 text-white font-bold rounded-lg hover:bg-black transition-all duration-300 cursor-pointer">
+          <button className="bg-blue-950 dark:bg-gray-800 text:black dark:text-amber-300 dark:hover:bg-grey-200 px-8 py-2.5 text-white font-bold rounded-lg hover:bg-black transition-all duration-300 cursor-pointer">
             Join now
           </button>
 
