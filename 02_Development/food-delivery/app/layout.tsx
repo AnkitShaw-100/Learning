@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import ResponsiveNav from "@/components/Home/Navbar/ResponsiveNav";
-import  Provider  from '@/components/HOC/Provider';
+import Provider from "@/components/HOC/Provider";
 import "./globals.css";
 
 const font = Manrope({
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
 });
 
@@ -23,8 +23,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${font.className} antialiased`}>
         <Provider>
-        <ResponsiveNav/>
-        {children}
+          <ResponsiveNav />
+          {children}
         </Provider>
       </body>
     </html>
