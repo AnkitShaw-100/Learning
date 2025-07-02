@@ -8,7 +8,7 @@ const AboutUs = () => {
         {/* Left Image */}
         <div className="w-full flex justify-center">
           <Image
-            src="/images/a.png" 
+            src="/images/a.png"
             alt="Delivery Illustration"
             width={400}
             height={400}
