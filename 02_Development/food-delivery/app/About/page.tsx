@@ -1,11 +1,8 @@
-import React from 'react'
+import React from "react";
 
+// Routing
 const AboutPage = () => {
-  return (
-    <div>
-      About Page is hereeee
-    </div>
-  )
-}
+  return <div>About Page is hereeee</div>;
+};
 
-export default AboutPage
+export default AboutPage;

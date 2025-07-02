@@ -11,11 +11,7 @@ const FeaturesCard = ({ title, image, subHeading }: Props) => {
     <div className="group bg-white dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer p-6 flex flex-col items-center text-center">
       {/* Image (icon style) */}
       <div className="w-20 h-20 sm:w-24 sm:h-24 mb-5">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-contain"
-        />
+        <img src={image} alt={title} className="w-full h-full object-contain" />
       </div>
 
       {/* Title */}

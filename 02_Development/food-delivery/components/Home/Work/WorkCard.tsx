@@ -13,11 +13,7 @@ const WorkCard = ({ title, image, subHeading, start }: Props) => {
     <div className="group bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col">
       {/* Image */}
       <div className="w-full h-[180px] flex items-center justify-center p-4 bg-gray-50 dark:bg-zinc-800">
-        <img
-          src={image}
-          alt={title}
-          className="h-full object-contain"
-        />
+        <img src={image} alt={title} className="h-full object-contain" />
       </div>
 
       {/* Content */}

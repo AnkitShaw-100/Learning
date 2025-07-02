@@ -10,7 +10,14 @@ type Props = {
   tags?: string[];
 };
 
-const RestaurantCard = ({ title, image, dish, price, rating = 4.5, tags = [] }: Props) => {
+const RestaurantCard = ({
+  title,
+  image,
+  dish,
+  price,
+  rating = 4.5,
+  tags = [],
+}: Props) => {
   return (
     <div className="group bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
       {/* Image */}
@@ -40,7 +47,9 @@ const RestaurantCard = ({ title, image, dish, price, rating = 4.5, tags = [] }: 
           {/* Rating */}
           <div className="flex items-center space-x-1 text-yellow-500">
             <FaStar className="w-4 h-4" />
-            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{rating}</span>
+            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+              {rating}
+            </span>
           </div>
         </div>
 

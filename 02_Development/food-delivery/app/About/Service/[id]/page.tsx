@@ -1,16 +1,13 @@
-import React from 'react'
+import React from "react";
 
 interface ServiceDetailsPageProps {
-    params: { id: string };
+  params: { id: string };
 }
 
-const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps)  => {
-    const id = params.id;
-    return (
-        <div>
-            We offer lot of servicesss letss have a look {id}
-        </div>
-    )
-}
+// Dynamic Routing
+const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps) => {
+  const id = params.id;
+  return <div>We offer lot of servicesss letss have a look {id}</div>;
+};
 
-export default ServiceDetailsPage
+export default ServiceDetailsPage;
