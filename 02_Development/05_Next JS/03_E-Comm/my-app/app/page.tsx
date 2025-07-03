@@ -14,7 +14,7 @@ const page = () => {
           id eius, voluptas, libero harum ad incidunt labore iste! Voluptatibus,
           ipsa consequatur.
         </p>
-        <Button variant="default">Click me</Button>
+        <Button variant="destructive">Click me</Button>
       </Container>
     </>
   );
