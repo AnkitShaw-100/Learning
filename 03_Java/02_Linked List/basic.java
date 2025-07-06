@@ -69,6 +69,6 @@ public class basic {
         displayreverse(a);
         // Counting length of the list
         int length = countLength(a);
-        System.out.println("Length of the list is : " +length);
+        System.out.println("Length of the list is : " + length);
     }
 }

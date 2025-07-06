@@ -11,7 +11,10 @@ const Logo = ({ className }: { className?: string }) => {
           className
         )}
       >
-        Shopcar<span className="text-shop_light_green group-hover:text-shop_dark_green hoverEffect">t</span>
+        Shopcar
+        <span className="text-shop_light_green group-hover:text-shop_dark_green hoverEffect">
+          t
+        </span>
       </h2>
     </Link>
   );

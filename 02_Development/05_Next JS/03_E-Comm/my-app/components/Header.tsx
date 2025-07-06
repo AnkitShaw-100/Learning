@@ -12,7 +12,7 @@ const Header = () => {
       <Container className="flex items-center justify-between">
         <Logo />
         <HeaderMenu />
-        <div className="w-1/3 md:w-1/3 flex items-center justify-end gap-5">
+        <div className="w-fit flex items-center justify-end gap-5">
           <SearchBar />
           <CartIcon />
           <FavouriteButton />
