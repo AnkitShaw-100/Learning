@@ -1,4 +1,3 @@
-
 // Largest and Second Largest
 import java.util.*;
 
