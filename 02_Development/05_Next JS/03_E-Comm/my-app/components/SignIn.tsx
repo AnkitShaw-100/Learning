@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const SignIn = () => {
   return (
-    <div>
-      
-    </div>
-  )
-}
+    <button className="text-sm font-semibold hover:text-darkColor hover:cursor-pointer hoverEffect">
+      Sign in
+    </button>
+  );
+};
 
-export default SignIn
+export default SignIn;
