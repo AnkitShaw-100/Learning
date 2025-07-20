@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    overflow: hidden;
+  }
+  
+  body {
+    height: 100%;
+    width: 100%;
+    background-color: #e4e4e4;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #d5d5d5;
+  }
+  
+  .Nike_image {
+    height: fit-content;
+    width: fit-content;
+    cursor: pointer;
+  }
+  
+  .heading_text {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 1rem; /* Added spacing between heading text items */
+    cursor: pointer;
+  }
+  
+  .login_button {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    color: white;
+    background-color: black;
+    cursor: pointer;
+  }
+  
+  .left {
+    height: 100vh;
+    width: 60%;
+  }
+  
+  .left_side_content {
+    margin-left: 100px;
+    margin-top: 40px;
+  }
+  
+  .left_upper_text {
+    font-size: 70px;
+  }
+  
+  .left_middle_text {
+    flex-wrap: content;
+    font-size: 20px;
+    margin-top: 10px;
+  }
+  
+  .shopnow_button {
+    font-size: 20px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    background-color: rgb(255, 0, 0);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .category_button {
+    font-size: 20px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    color: rgb(0, 0, 0);
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    border: 2px solid black;
+    margin-left: 10px;
+  }
+  
+  .left_bottom_text {
+    margin-top: 15px;
+    font-size: 17px;
+  }
+  
+  .flipkart_logo {
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+  }
+  
+  .amazon_logo {
+    height: 30px;
+    width: 30px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .main_content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .right {
+    height: 100vh;
+    width: 40%;
+  }
+  
+  .shoe_image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) { /* New code: For tablets */
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .heading_text {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+  
+    .left, .right {
+      width: 100%;
+      height: auto;
+    }
+  
+    .main_content {
+      flex-direction: column;
+    }
+  
+    .left_side_content {
+      margin: 20px;
+    }
+  
+    .left_upper_text {
+      font-size: 50px; /* Adjust font size for smaller screens */
+    }
+  
+    .shopnow_button, .category_button {
+      font-size: 16px; /* Adjust button font size */
+      padding: 0.4rem 0.8rem;
+    }
+  
+    .left_bottom_text {
+      font-size: 14px; /* Adjust text size */
+    }
+  }
+  
+  @media (max-width: 480px) { /* New code: For mobile devices */
+    .navbar {
+      padding: 1rem;
+    }
+  
+    .Nike_image {
+      width: 80px; /* Adjust logo size */
+      height: auto;
+    }
+  
+    .left_upper_text {
+      font-size: 40px; /* Further reduce text size */
+    }
+  
+    .shopnow_button, .category_button {
+      font-size: 14px;
+      padding: 0.3rem 0.6rem;
+    }
+  
+    .flipkart_logo, .amazon_logo {
+      height: 20px; /* Adjust logo size */
+      width: 20px;
+    }
+  
+    .left_side_content {
+      margin: 10px;
+    }
+  
+    .right {
+      display: none; /* Hide right section for very small screens */
+    }
+  }
+  
