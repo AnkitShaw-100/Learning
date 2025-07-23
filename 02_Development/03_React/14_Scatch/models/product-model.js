@@ -13,4 +13,5 @@ const productSchema = mongoose.Schema({
   stock: { type: Number, default: 0, min: 0 },
 });
 
-module.exports = mongoose.model("product", productSchema);
+// Check if model already exists and use consistent naming
+module.exports = mongoose.models.Product || mongoose.model("Product", productSchema);
