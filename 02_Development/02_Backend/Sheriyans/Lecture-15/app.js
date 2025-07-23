@@ -71,7 +71,6 @@ app.post("/login", async function(req, res){
             }
             
             if(result) {
-                // Password is correct, create JWT and set cookie
                 const token = jwt.sign(
                     { email: user.email, userid: user._id }, 
                     "secret"
