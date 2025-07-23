@@ -2,29 +2,26 @@ import { MdDarkMode } from "react-icons/md";
 
 const Navbar = () => {
     return (
-        <div className='flex items-center justify-between px-8 md:px-12 lg:px-16 py-4 bg-slate-100'>
-
+        <div
+            className="flex items-center justify-between py-4 bg-slate-100"
+            style={{ paddingLeft: '15%', paddingRight: '15%' }}
+        >
             {/* Logo */}
-            <h1 className='text-black text-xl max-[600px]:text-lg sm:text-2xl font-bold whitespace-nowrap'>Urban
-                <span className='text-blue-500'>Nest</span></h1>
+            <h1 className='text-black text-xl max-[600px]:text-lg sm:text-2xl font-bold whitespace-nowrap'>
+                Urban<span className='text-blue-500'>Nest</span>
+            </h1>
 
-            {/* Nav Links with hover underline + progressive hiding */}
+            {/* Nav Links */}
             <div className='flex space-x-8 font-medium text-sm sm:text-base'>
-                <p className='relative cursor-pointer hover:font-bold hover:text-blue-500 after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300'>
-                    Home
-                </p>
-                <p className='relative cursor-pointer hover:font-bold hover:text-blue-500 max-[980px]:hidden after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300'>
-                    Product
-                </p>
-                <p className='relative cursor-pointer hover:font-bold hover:text-blue-500 max-[920px]:hidden after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300'>
-                    Services
-                </p>
-                <p className='relative cursor-pointer hover:font-bold hover:text-blue-500 max-[860px]:hidden after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300'>
-                    Contact
-                </p>
-                <p className='relative cursor-pointer hover:font-bold hover:text-blue-500 max-[800px]:hidden after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300'>
-                    About Us
-                </p>
+                {['Home', 'Product', 'Services', 'Contact', 'About Us'].map((text, index) => (
+                    <p
+                        key={text}
+                        className={`relative cursor-pointer hover:font-bold hover:text-blue-500 ${[null, 'max-[980px]:hidden', 'max-[920px]:hidden', 'max-[860px]:hidden', 'max-[800px]:hidden'][index]
+                            } after:content-[""] after:absolute after:left-1/4 after:bottom-0 after:h-[2px] after:w-1/2 after:bg-blue-500 after:scale-x-0 hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300`}
+                    >
+                        {text}
+                    </p>
+                ))}
             </div>
 
             {/* Buttons */}

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-// Use environment variable or fallback to local MongoDB
-const mongoURI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/scatch";
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose
   .connect(mongoURI)
