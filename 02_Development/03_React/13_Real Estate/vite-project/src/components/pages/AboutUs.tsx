@@ -1,36 +1,34 @@
-import Ankit from "./team/Ankit.png";
-import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
+import { motion } from "framer-motion";
+import Ankit from "../../assets/team/Ankit.png";
+import { FaLinkedin, FaGithub } from "react-icons/fa";
 
 const AboutUs = () => {
   const teamMembers = [
     {
-      name: "Ankit",
+      name: "Ankit Shaw",
       role: "Backend Developer",
+      image: Ankit,
+      social: {
+        linkedin: "https://www.linkedin.com/in/ankit-shaw-884b0728a/",
+        github: "https://github.com/AnkitShaw-100",
+      },
+    },
+    {
+      name: "Amiya Mishu",
+      role: "Frontend Developer",
       image: Ankit,
       social: {
         linkedin: "#",
         github: "#",
-        twitter: "#",
       },
     },
     {
-      name: "Amiya",
-      role: "Frontend Developer",
-      image: Ankit, // Replace with real image later
-      social: {
-        linkedin: "#",
-        github: "#",
-        twitter: "#",
-      },
-    },
-    {
-      name: "Sakshi",
+      name: "Sakshi Gupta",
       role: "AI/ML Developer",
-      image: Ankit, // Replace with real image later
+      image: Ankit,
       social: {
         linkedin: "#",
         github: "#",
-        twitter: "#",
       },
     },
   ];
@@ -40,9 +38,9 @@ const AboutUs = () => {
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-4">
-          Meet Our <span className="text-blue-600">Team</span>
+          Meet Our <span className="text-blue-800">Team</span>
         </h2>
-        <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
+        <div className="w-20 h-1 bg-blue-900 mx-auto mb-6"></div>
         <p className="text-gray-600 text-md sm:text-lg max-w-3xl mx-auto">
           Behind our real estate platform is a talented team of developers and designers
           committed to transforming property buying and selling into a seamless experience.
@@ -52,12 +50,20 @@ const AboutUs = () => {
       {/* Team Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {teamMembers.map((member, idx) => (
-          <div
+          <motion.div
             key={idx}
             className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden group"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: idx * 0.15 }}
           >
-            <div className="relative">
-              <img
+            <motion.div
+              className="relative"
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.img
                 src={member.image}
                 alt={member.name}
                 className="w-full h-64 object-cover"
@@ -65,33 +71,28 @@ const AboutUs = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
                 <div className="flex space-x-4 text-white">
                   <a href={member.social.linkedin} aria-label="LinkedIn">
-                    <FaLinkedin className="w-5 h-5 hover:text-blue-300 transition" />
+                    <FaLinkedin className="w-5 h-5 hover:text-blue-800 transition" />
                   </a>
                   <a href={member.social.github} aria-label="GitHub">
-                    <FaGithub className="w-5 h-5 hover:text-blue-300 transition" />
-                  </a>
-                  <a href={member.social.twitter} aria-label="Twitter">
-                    <FaTwitter className="w-5 h-5 hover:text-blue-300 transition" />
+                    <FaGithub className="w-5 h-5 hover:text-blue-800 transition" />
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
+
             <div className="p-6 text-center">
               <h3 className="text-xl font-semibold text-gray-900">{member.name}</h3>
-              <p className="text-blue-600 font-medium">{member.role}</p>
+              <p className="text-blue-900 font-medium">{member.role}</p>
               <div className="mt-4 flex justify-center space-x-3">
-                <a href={member.social.linkedin} className="text-gray-400 hover:text-blue-600">
+                <a href={member.social.linkedin} className="text-gray-400 hover:text-blue-800">
                   <FaLinkedin className="w-4 h-4" />
                 </a>
-                <a href={member.social.github} className="text-gray-400 hover:text-blue-600">
+                <a href={member.social.github} className="text-gray-400 hover:text-blue-800">
                   <FaGithub className="w-4 h-4" />
-                </a>
-                <a href={member.social.twitter} className="text-gray-400 hover:text-blue-600">
-                  <FaTwitter className="w-4 h-4" />
                 </a>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -104,7 +105,7 @@ const AboutUs = () => {
           <div className="relative flex justify-center">
             <span className="bg-white px-4 text-gray-500">
               <svg
-                className="w-8 h-8 text-blue-500"
+                className="w-8 h-8 text-blue-900"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

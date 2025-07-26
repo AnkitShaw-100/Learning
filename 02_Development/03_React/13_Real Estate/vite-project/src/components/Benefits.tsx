@@ -60,7 +60,7 @@ const Benefits = () => {
                         viewport={{ once: true }}
                         className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all text-center border border-gray-100"
                     >
-                        <p className="text-3xl font-bold text-blue-600 mb-4">
+                        <p className="text-3xl font-bold text-blue-900 mb-4">
                             {benefit.number}
                         </p>
                         <h3 className="text-xl font-semibold text-gray-800 mb-3">
