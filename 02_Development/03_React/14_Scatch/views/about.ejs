@@ -1,0 +1,205 @@
+<%- include('./partials/header') %>
+
+    <% if(error && error.length > 0){ %>
+        <div class="fixed top-5 left-1/2 transform -translate-x-1/2 p-4 rounded-lg bg-red-500 text-white z-50 shadow-lg">
+            <div class="flex items-center">
+                <i class="ri-error-warning-line mr-2"></i>
+                <span><%= error[0] %></span>
+            </div>
+        </div>
+        <% } %>
+        
+    <% if(success && success.length > 0){ %>
+        <div class="fixed top-5 left-1/2 transform -translate-x-1/2 p-4 rounded-lg bg-green-500 text-white z-50 shadow-lg">
+            <div class="flex items-center">
+                <i class="ri-check-line mr-2"></i>
+                <span><%= success[0] %></span>
+            </div>
+        </div>
+        <% } %>
+
+    <!-- Main About Content -->
+    <div class="min-h-screen bg-gray-50 pt-16">
+        
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="text-center">
+                    <h1 class="text-5xl font-bold mb-6">About Scatch</h1>
+                    <p class="text-xl opacity-90 max-w-3xl mx-auto">
+                        We're passionate about bringing you the finest collection of premium products, 
+                        crafted with excellence and delivered with care.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Story Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
+                    <p class="text-gray-600 mb-4">
+                        Founded in 2024, Scatch began with a simple mission: to create an exceptional 
+                        shopping experience that combines quality, style, and convenience. We believe 
+                        that every product should tell a story and every customer should feel valued.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        From our humble beginnings as a small startup to becoming a trusted name in 
+                        e-commerce, we've never lost sight of what matters most - delivering products 
+                        that exceed expectations and service that makes you smile.
+                    </p>
+                    <p class="text-gray-600">
+                        Today, we continue to innovate and expand our offerings, always keeping our 
+                        customers at the heart of everything we do.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-8">
+                    <div class="text-center">
+                        <i class="ri-store-line text-6xl text-blue-600 mb-4"></i>
+                        <h3 class="text-2xl font-semibold text-gray-900 mb-2">Premium Quality</h3>
+                        <p class="text-gray-600">
+                            Every product is carefully selected and tested to ensure it meets our 
+                            high standards of quality and craftsmanship.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Values Section -->
+        <div class="bg-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">
+                        These core values guide everything we do and shape the way we interact 
+                        with our customers, partners, and community.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Quality -->
+                    <div class="text-center">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-award-line text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Quality First</h3>
+                        <p class="text-gray-600">
+                            We never compromise on quality. Every product is thoroughly vetted 
+                            and must meet our stringent quality standards.
+                        </p>
+                    </div>
+
+                    <!-- Customer Satisfaction -->
+                    <div class="text-center">
+                        <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-customer-service-line text-2xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Customer First</h3>
+                        <p class="text-gray-600">
+                            Your satisfaction is our priority. We're here to help and ensure 
+                            you have the best shopping experience possible.
+                        </p>
+                    </div>
+
+                    <!-- Innovation -->
+                    <div class="text-center">
+                        <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-lightbulb-line text-2xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Innovation</h3>
+                        <p class="text-gray-600">
+                            We continuously innovate and improve our platform to provide you 
+                            with the latest features and best user experience.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Behind Scatch is a dedicated team of professionals who are passionate 
+                    about delivering excellence in every aspect of our business.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Team Member 1 -->
+                <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="ri-user-line text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Alex Johnson</h3>
+                    <p class="text-blue-600 mb-2">Founder & CEO</p>
+                    <p class="text-gray-600 text-sm">
+                        Visionary leader with 10+ years of experience in e-commerce and retail innovation.
+                    </p>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="ri-user-line text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Sarah Chen</h3>
+                    <p class="text-green-600 mb-2">Head of Design</p>
+                    <p class="text-gray-600 text-sm">
+                        Creative director ensuring every product and experience is beautifully crafted.
+                    </p>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="bg-white rounded-lg shadow-sm p-6 text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="ri-user-line text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Michael Rodriguez</h3>
+                    <p class="text-purple-600 mb-2">Customer Success</p>
+                    <p class="text-gray-600 text-sm">
+                        Dedicated to ensuring every customer has an exceptional experience with Scatch.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+                <h2 class="text-3xl font-bold mb-4">Ready to Start Shopping?</h2>
+                <p class="text-xl opacity-90 mb-8">
+                    Discover our curated collection of premium products and experience the Scatch difference.
+                </p>
+                <div class="space-x-4">
+                    <a href="/shop" class="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        <i class="ri-shopping-bag-line mr-2"></i>
+                        Shop Now
+                    </a>
+                    <a href="/contact" class="inline-flex items-center px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                        <i class="ri-mail-line mr-2"></i>
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-hide flash messages -->
+    <script>
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('[class*="fixed top-5"]');
+            flashMessages.forEach(function(msg) {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(function() {
+                    msg.remove();
+                }, 500);
+            });
+        }, 4000);
+    </script>
+
+<%- include('./partials/footer') %>
