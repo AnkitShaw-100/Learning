@@ -1,72 +1,101 @@
+// 1. Install Dependencies - Done
+// 2. Create .env file - Done
+// 3. Connect to MongoDB - Done
+// 4. Create a Note Schema - Done - Schema are made and stored in models folder and in seperate file
+
+require("dotenv").config();
 const express = require("express");
+const mongoose = require("mongoose");
 const app = express();
-const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
 
-// In-memory notes array
-let notes = [];
-let idCounter = 1;
+//Connecting to MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.log("MongoDB connection error", err));
+
+// Importing Schema
+const Note = require("./models/Note");
 
 // Creating a note
-app.post("/notes", (req, res) => {
-  const { title, content } = req.body;
+app.post("/notes", async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required." });
+    }
 
-  if (!title || !content) {
-    return res
-      .status(400)
-      .json({ error: "Title and content both are required." });
+    const note = await Note.create({ title, content });
+    res.status(201).json(note);
+  } catch (error) {
+    res.status(500).json({ error: "Filed to create note." });
   }
-
-  const newNote = {
-    id: idCounter++,
-    title,
-    content,
-  };
-
-  notes.push(newNote);
-  res.status(201).json(newNote);
 });
 
 // Get the node by id
-app.get("/notes/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const note = notes.find((n) => n.id === id);
+app.get("/notes/:id", async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
 
-  if (!note) {
-    return res.status(404).json({ error: "Note not found." });
+    if (!note) {
+      return res.status(404).json({
+        error: "Note not found",
+      });
+    }
+    res.json(note);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch note" });
   }
-  res.json(note);
 });
 
 // Update the note by id
-app.put("/notes/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const { title, content } = req.body;
-  const note = notes.find((n) => n.id === id);
+app.put("/notes/:id", async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { title, content },
+      { new: true }
+    );
 
-  if (!note) {
-    return res.status(404).json({ error: "Note not found" });
+    if (!note) {
+      return res.status(404).json({
+        error: "Note not found",
+      });
+    }
+    res.json(note);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to update note" });
   }
-
-  if (title) note.title = title;
-  if (content) note.content = content;
-
-  res.json(note);
 });
 
 // Delete the note
-app.delete("/notes/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const index = notes.findIndex((n) => n.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: "Note not found" });
+app.delete("/notes/:id", async (req, res) => {
+  try {
+    const note = await Note.findByIdAndDelete(req.params.id);
+    if (!note) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+    res.json({ message: "Note deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete Note" });
   }
+});
 
-  notes.splice(index, 1);
-  res.json({ message: "Note deleted Successfully" });
+// Get all notes sorted by latest
+app.get("/notes", async (req, res) => {
+  try {
+    const notes = await Note.find().sort({ createdAt: -1 });
+    res.json(notes);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch notes" });
+  }
 });
 
 // Server
