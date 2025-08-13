@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import listingRoutes from "./routes/listing.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
+import propertyRoutes from "./routes/propertyRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -21,6 +22,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/properties", propertyRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
