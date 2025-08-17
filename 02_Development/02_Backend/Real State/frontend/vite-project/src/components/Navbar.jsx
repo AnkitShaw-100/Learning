@@ -1,16 +1,223 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-export default function Navbar() {
+const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [signupDropdown, setSignupDropdown] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    // Try to fetch current user if token exists
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    axios
+      .get("http://localhost:5000/api/auth/me", { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null));
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setSignupDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMenu = () => setMenuOpen((v) => !v);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login");
+  };
+
+  const handleBuyNow = () => {
+    if (!user) return navigate("/login");
+    return navigate("/properties");
+  };
+
+  const navLinks = [
+  { text: "Home", path: "/" },
+  { text: "Properties", path: "/properties" },
+  { text: "Benefits", path: "/#benefits" },
+  { text: "Reviews", path: "/#testimonials" },
+  { text: "Contact", path: "/#footer" },
+  ];
+
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between">
-      <h1 className="text-lg font-bold">Real Estate Portal</h1>
-      <div className="flex gap-4">
-        <Link to="/">Home</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/register">Register</Link>
-        <Link to="/dashboard">Dashboard</Link>
+    <nav className="bg-white shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex-shrink-0">
+            <Link to="/" className="text-2xl font-bold text-blue-900">
+              UrbanNest
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.text}
+                to={link.path}
+                className="text-slate-800 font-medium text-base cursor-pointer hover:text-blue-800 transition"
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+
+          <div className="hidden md:flex space-x-2 sm:space-x-4 items-center">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+                <Link
+                  to={user.role === "seller" ? "/dashboard" : "/dashboard"}
+                  className="text-blue-800 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base rounded bg-slate-200 font-medium hover:bg-blue-200 inline-block"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/favorites"
+                  className="text-blue-800 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base rounded bg-slate-200 font-medium hover:bg-blue-200 inline-block"
+                >
+                  Favorites
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-red-600 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base rounded border border-red-600 font-medium hover:bg-red-50 inline-block"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setSignupDropdown(!signupDropdown)}
+                    className="text-blue-800 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base rounded bg-slate-200 font-medium hover:bg-blue-200 inline-block"
+                  >
+                    Sign In ▼
+                  </button>
+                  {signupDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                      <Link
+                        to="/login"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setSignupDropdown(false)}
+                      >
+                        Login
+                      </Link>
+                      <div className="border-t border-gray-100 my-1"></div>
+                      <Link
+                        to="/register"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setSignupDropdown(false)}
+                      >
+                        Sign up
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleBuyNow}
+                  className="text-white bg-blue-900 px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base rounded font-semibold hover:bg-blue-800 inline-block"
+                >
+                  Buy now
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="md:hidden flex items-center">
+            <button onClick={toggleMenu} className="text-2xl text-slate-800 hover:text-blue-800 focus:outline-none">
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          </div>
+        </div>
+
+        {menuOpen && (
+          <div className="md:hidden px-4 pt-4 pb-6 space-y-4 bg-slate-50 border-t border-slate-200">
+            {navLinks.map((link) => (
+              <Link
+                key={link.text}
+                to={link.path}
+                className="block text-slate-800 font-medium text-base cursor-pointer hover:text-blue-800"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.text}
+              </Link>
+            ))}
+            <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+                  <Link
+                    to="/favorites"
+                    className="text-blue-800 px-4 py-2 rounded bg-slate-200 font-medium hover:bg-slate-300 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Favorites
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="text-blue-800 px-4 py-2 rounded bg-slate-200 font-medium hover:bg-slate-300 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMenuOpen(false);
+                    }}
+                    className="text-red-600 px-4 py-2 rounded border border-red-600 font-medium hover:bg-red-50 text-center"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-blue-800 px-4 py-2 rounded bg-slate-200 font-medium hover:bg-slate-300 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <div className="text-sm text-gray-500 text-center">Or sign up as:</div>
+                  <Link
+                    to="/register"
+                    className="text-white bg-green-600 px-4 py-2 rounded font-medium hover:bg-green-700 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sign up
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleBuyNow();
+                      setMenuOpen(false);
+                    }}
+                    className="text-white bg-blue-900 px-4 py-2 rounded font-semibold hover:bg-blue-800 text-center"
+                  >
+                    Buy now
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;

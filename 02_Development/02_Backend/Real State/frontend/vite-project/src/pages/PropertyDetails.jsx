@@ -84,7 +84,7 @@ const PropertyDetails = () => {
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg mt-6 overflow-hidden">
       <img
-        src={property.images?.[0] || "https://via.placeholder.com/800x400"}
+        src={property.images?.[0] || '/placeholder.svg'}
         alt={property.title}
         className="w-full h-96 object-cover"
       />
