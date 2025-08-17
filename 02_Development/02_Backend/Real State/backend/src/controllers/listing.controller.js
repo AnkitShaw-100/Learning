@@ -1,11 +1,28 @@
+
+// @desc Get all listings for a specific user (owner)
+export const getUserListings = async (req, res) => {
+  try {
+    const listings = await Listing.find({ owner: req.user.id }).sort({ createdAt: -1 });
+    res.json(listings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 import Listing from "../models/Listing.js";
 
 // @desc Create listing (seller/admin)
 export const createListing = async (req, res) => {
   try {
+    // Handle uploaded images
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((file) => `/uploads/${file.filename}`);
+    }
+
     const listing = await Listing.create({
       ...req.body,
-      owner: req.user.id
+      owner: req.user.id,
+      images,
     });
     res.status(201).json(listing);
   } catch (err) {

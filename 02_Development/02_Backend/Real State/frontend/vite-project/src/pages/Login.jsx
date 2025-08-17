@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axiosInstance.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
-      alert("Login successful");
+  // Redirect to home after successful login
+  navigate('/');
     } catch (err) {
       alert("Invalid credentials");
     }
@@ -36,6 +39,11 @@ export default function Login() {
         />
         <button className="bg-blue-600 text-white p-2">Login</button>
       </form>
+      <div className="mt-2 text-right">
+        <Link to="/forgot-password" className="text-blue-600 hover:underline text-sm">
+          Forgot Password?
+        </Link>
+      </div>
     </div>
   );
 }

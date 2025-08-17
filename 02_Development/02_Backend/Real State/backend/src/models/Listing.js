@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const listingSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
@@ -9,7 +10,8 @@ const listingSchema = new mongoose.Schema({
   location: { type: String, required: true },
   propertyType: { type: String, enum: ["apartment", "house", "land", "villa", "office"], default: "house" },
   status: { type: String, enum: ["available", "sold"], default: "available" },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  images: [{ type: String }], // Array of image file paths/URLs
 }, { timestamps: true });
 
 export default mongoose.model("Listing", listingSchema);

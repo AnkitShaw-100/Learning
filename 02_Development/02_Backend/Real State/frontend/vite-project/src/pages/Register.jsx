@@ -5,11 +5,12 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("buyer");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post("/auth/register", { name, email, password });
+      await axiosInstance.post("/auth/register", { name, email, password, role });
       alert("Registration successful, please login.");
     } catch (err) {
       alert("Error registering user");
@@ -20,6 +21,15 @@ export default function Register() {
     <div className="p-6 max-w-sm mx-auto">
       <h2 className="text-xl font-bold mb-4">Register</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <select
+          className="border p-2"
+          value={role}
+          onChange={e => setRole(e.target.value)}
+          required
+        >
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+        </select>
         <input
           type="text"
           placeholder="Name"

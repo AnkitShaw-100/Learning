@@ -1,11 +1,13 @@
 
-
 import express from "express";
-import { registerUser, loginUser } from "../controllers/auth.controller.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { registerUser, loginUser, requestPasswordReset, resetPassword } from "../controllers/auth.controller.js";
 
 const router = express.Router();
+// Password reset endpoints
+router.post("/request-password-reset", requestPasswordReset);
+router.post("/reset-password", resetPassword);
 
 
 
