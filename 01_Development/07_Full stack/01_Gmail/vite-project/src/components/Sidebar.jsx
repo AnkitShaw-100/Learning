@@ -4,6 +4,7 @@ import { IoMdStar } from "react-icons/io";
 import { MdOutlineWatchLater, MdOutlineKeyboardArrowDown, MdOutlineDrafts, MdInbox } from "react-icons/md";
 import { TbSend2 } from "react-icons/tb";
 
+// Items ko yaha define kiye hain
 const sidebarItems = [
   {
     icon: <MdInbox size={"20px"} />,
@@ -30,19 +31,28 @@ const sidebarItems = [
 const Sidebar = () => {
   const [selected, setSelected] = useState(0);
   return (
-    <div className='w-[15%]'>
+    <div className='hidden md:block w-64 md:w-[15%] min-w-[64px] max-w-xs transition-all duration-300 bg-white h-full'>
+      {/* Compose button */}
+      <div className='p-3 pl-3'>
+        <button className='flex items-center gap-2 bg-[#C2E7FF] p-4 rounded-2xl hover:shadow-md'>
+          <LuPencil size={"24px"} />
+          Compose
+        </button>
+      </div>
+      {/* Sidebar ke sare items */}
       <div className='text-gray-500'>
         {
           sidebarItems.map((item, idx) => {
             return (
-              <div onClick={() => setSelected(idx)} key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-6 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer`}>
+              <div onClick={() => setSelected(idx)} key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-10 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer px-10`}>
                 {item.icon}
-                <p>{item.text}</p>
+                <p className={selected === idx ? 'font-bold' : ''}>{item.text}</p>
               </div>
             )
           })
         }
-        <div className='flex items-center pl-6 gap-4 cursor-pointer hover:bg-gray-200 rounded-r-full py-1'>
+        {/* More button  */}
+        <div className='flex items-center pl-10 gap-4 cursor-pointer hover:bg-gray-200 rounded-r-full py-1'>
           <MdOutlineKeyboardArrowDown size={"20px"} />
           <span>More</span>
         </div>
