@@ -7,7 +7,7 @@ import Signup from './components/Signup';
 
 const App = () => {
   const [auth, setAuth] = useState(!!localStorage.getItem('token'));
-  const [showSignup, setShowSignup] = useState(false);
+  const [showSignup, setShowSignup] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const handleEmailSent = () => setRefreshKey(k => k + 1);
 
@@ -21,7 +21,7 @@ const App = () => {
           </>
         ) : (
           <>
-            <Login onLogin={() => setAuth(true)} />
+            <Login onLogin={() => setAuth(true)} onSignup={() => setShowSignup(true)} />
             <p className="mt-2">Don't have an account? <button className="text-blue-500" onClick={() => setShowSignup(true)}>Sign Up</button></p>
           </>
         )}
@@ -32,7 +32,7 @@ const App = () => {
   // If logged in, show the app
   return (
     <>
-      <Navbar />
+      <Navbar onLogout={() => setAuth(false)} />
       <Body refreshKey={refreshKey} onEmailSent={handleEmailSent} />
       <div className='absolute w-[30%] bottom-0 right-20 z-10'>
       </div>

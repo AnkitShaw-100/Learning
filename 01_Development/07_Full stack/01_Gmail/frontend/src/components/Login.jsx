@@ -1,58 +1,87 @@
-import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
 
+const Login = ({ onLogin, onSignup }) => {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
-const Login = ({ onLogin }) => {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  // const navigate = useNavigate();
-
-  const handleChange = e => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Login failed');
-      localStorage.setItem('token', data.token);
+      if (!res.ok) throw new Error(data.message || "Login failed");
+      localStorage.setItem("token", data.token);
       onLogin();
-      // navigate('/'); // Redirect to home page
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Google font import for demo (optional, best in index.html)
-  const googleFont = {
-    fontFamily: 'Roboto, Arial, sans-serif'
-  };
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100" style={googleFont}>
-      <div className="bg-white rounded-lg shadow-lg p-0 w-full max-w-md flex flex-col items-center border border-gray-200">
-        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google Logo" className="w-28 mt-8 mb-2" />
-        <h2 className="text-2xl font-normal mb-1 text-gray-800">Sign in</h2>
-        <p className="text-gray-500 mb-6 text-sm">to continue to Gmail</p>
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4 px-8">
-          <input name="email" value={form.email} onChange={handleChange} placeholder="Email" type="email" className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" required />
-          <input name="password" value={form.password} onChange={handleChange} placeholder="Password" type="password" className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" required />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 font-roboto">
+      {/* ✅ Same size as signup but no image */}
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl border border-gray-200 px-12 py-10">
+        <img
+          src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
+          alt="Google Logo"
+          className="w-28 mb-6"
+        />
+        <h2 className="text-2xl font-normal mb-2 text-gray-800">Log in</h2>
+        <p className="text-gray-500 mb-8 text-sm">to continue to Gmail</p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            type="email"
+            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            required
+          />
+          <input
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Password"
+            type="password"
+            className="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            required
+          />
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          <button type="submit" className="bg-[#1a73e8] hover:bg-[#1765c1] text-white font-medium py-2 rounded shadow mt-2 tracking-wide">Next</button>
+          <button
+            type="submit"
+            className="bg-[#1a73e8] hover:bg-[#1765c1] text-white font-medium py-2 rounded shadow mt-2 tracking-wide"
+          >
+            Next
+          </button>
         </form>
-        <div className="w-full flex items-center my-4 px-8">
+
+        <div className="flex items-center my-6">
           <div className="flex-1 h-px bg-gray-200" />
           <span className="mx-2 text-gray-400 text-xs">or</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
-        <p className="mb-8 text-xs text-gray-500">Don't have an account? Use the signup page.</p>
+
+        <p className="text-xs text-gray-500">
+          Don&apos;t have an account?{" "}
+          <button
+            type="button"
+            className="text-blue-500 underline hover:text-blue-700 focus:outline-none"
+            onClick={onSignup}
+          >
+            Sign up
+          </button>
+        </p>
       </div>
     </div>
   );

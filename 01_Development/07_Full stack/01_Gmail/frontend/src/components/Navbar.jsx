@@ -1,20 +1,19 @@
 import React, { useState } from 'react'
-import { IoSettingsOutline } from "react-icons/io5";
+import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { PiDotsNineBold } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import { RxHamburgerMenu } from "react-icons/rx";
 import Avatar from 'react-avatar';
 
-const Navbar = () => {
+const Navbar = ({ onLogout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  // Search bar ke liye state
   const [searchText, setSearchText] = useState("");
 
   return (
     <nav className="flex items-center justify-between mx-3 h-16 relative">
-      {/* Yahan left side me hamburger aur logo hai */}
+      {/* Left side: Hamburger + Logo */}
       <div className="flex items-center gap-2 p-10">
         <button
           className="p-3 rounded-full hover:bg-gray-100 cursor-pointer md:hidden"
@@ -23,11 +22,20 @@ const Navbar = () => {
         >
           <RxHamburgerMenu size={'20px'} />
         </button>
-        <img className="w-8" src={"https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png"} alt="Gmail Logo" />
-        <h1 className={`text-2xl text-gray-500 font-medium hidden md:block transition-opacity duration-200 ${mobileSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>Gmail</h1>
+        <img
+          className="w-8"
+          src={"https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png"}
+          alt="Gmail Logo"
+        />
+        <h1
+          className={`text-2xl text-gray-500 font-medium hidden md:block transition-opacity duration-200 
+          ${mobileSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >
+          Gmail
+        </h1>
       </div>
 
-      {/* Yahan beech me search bar dikh rahi hai (sirf desktop par) */}
+      {/* Desktop Search Bar */}
       <div className="hidden md:block flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl mx-4">
         <div className="flex items-center bg-[#EAF1FB] px-2 py-3 rounded-full">
           <IoIosSearch size="24px" className="text-gray-700" />
@@ -41,7 +49,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Yahan right side me icons dikh rahe hain (sirf desktop par) */}
+      {/* Desktop Right Icons */}
       <div className="hidden md:block p-10">
         <div className="flex items-center gap-2">
           <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
@@ -53,13 +61,23 @@ const Navbar = () => {
           <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
             <PiDotsNineBold size={"20px"} />
           </div>
-          <div className="relative cursor-pointer">
-            <Avatar size="40" round={true} />
-          </div>
+          {/* Updated Logout Button */}
+          <button
+            className="ml-4 flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-red-500 to-red-600 
+                       hover:from-red-600 hover:to-red-700 text-white font-medium 
+                       rounded-full shadow-md transition-all duration-300 ease-in-out"
+            onClick={() => {
+              localStorage.removeItem('token');
+              if (onLogout) onLogout();
+            }}
+          >
+            <IoLogOutOutline size={18} />
+            Logout
+          </button>
         </div>
       </div>
 
-      {/* Mobile view me search aur avatar dikhega sirf */}
+      {/* Mobile Right Side */}
       <div className="flex items-center gap-2 md:hidden">
         <button
           className="p-2 rounded-full hover:bg-gray-100"
@@ -68,12 +86,22 @@ const Navbar = () => {
         >
           <IoIosSearch size="22px" className="text-gray-700" />
         </button>
-        <div className="p-2 rounded-full hover:bg-gray-100 cursor-pointer">
-          <Avatar size="32" round={true} />
-        </div>
+        {/* Updated Mobile Logout */}
+        <button
+          className="ml-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 
+                     hover:from-red-600 hover:to-red-700 text-white font-medium 
+                     rounded-full shadow-md transition-all duration-300 ease-in-out"
+          onClick={() => {
+            localStorage.removeItem('token');
+            if (onLogout) onLogout();
+          }}
+        >
+          <IoLogOutOutline size={16} />
+          Logout
+        </button>
       </div>
 
-      {/* Mobile menu open hone par yahan dropdown dikh raha hai */}
+      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="absolute top-16 left-0 w-full bg-white shadow-lg z-50 flex flex-col md:hidden animate-fade-in">
           <button className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 text-left">
@@ -91,7 +119,7 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile search open hone par yahan search bar overlay dikh rahi hai */}
+      {/* Mobile Search Overlay */}
       {mobileSearchOpen && (
         <div className="fixed left-0 top-16 w-full bg-white shadow-lg z-[60] flex items-center px-4 py-3 md:hidden animate-fade-in border-b border-gray-200">
           <IoIosSearch size="22px" className="text-gray-700 mr-2" />
