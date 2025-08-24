@@ -1,5 +1,4 @@
 import express from "express";
-
 import Email from "../models/Email.js";
 import auth from "../middlewares/auth.js";
 import { validateBody } from "../middlewares/validate.js";
@@ -7,10 +6,10 @@ import { createEmailSchema } from "../validators/emailValidator.js";
 
 const router = express.Router();
 
-
 // Create a new email (send email)
 router.post("/", auth, validateBody(createEmailSchema), async (req, res) => {
   try {
+    console.log(req.body, req.user.email);
     const { to, subject, body } = req.body;
     // 'from' is set from logged-in user
     const from = req.user.email;
@@ -23,17 +22,22 @@ router.post("/", auth, validateBody(createEmailSchema), async (req, res) => {
 });
 
 // Get all emails for the logged-in user (inbox)
+// Get all emails for the logged-in user (inbox and sent)
 router.get("/", auth, async (req, res) => {
   try {
     const userEmail = req.user.email;
-    // Find emails where 'to' is the logged-in user
-    const emails = await Email.find({ to: userEmail }).sort({ createdAt: -1 });
+    // Find emails where 'to' or 'from' is the logged-in user
+    const emails = await Email.find({
+      $or: [
+        { to: userEmail },
+        { from: userEmail }
+      ]
+    }).sort({ createdAt: -1 });
     res.json(emails);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 // (Optional) Mark email as read
 router.patch("/:id/read", auth, async (req, res) => {
@@ -41,7 +45,8 @@ router.patch("/:id/read", auth, async (req, res) => {
     const email = await Email.findById(req.params.id);
     if (!email) return res.status(404).json({ message: "Email not found" });
     // Only recipient can mark as read
-    if (email.to !== req.user.email) return res.status(403).json({ message: "Not allowed" });
+    if (email.to !== req.user.email)
+      return res.status(403).json({ message: "Not allowed" });
     email.read = true;
     await email.save();
     res.json(email);

@@ -4,12 +4,12 @@ import { Outlet } from 'react-router-dom'
 import Navbar from './Navbar'
 
 
-const Body = () => {
+const Body = ({ refreshKey, onEmailSent }) => {
     return (
         <div className='flex'>
-            <Sidebar />
-            {/* Outlet ek placeholder hai, yahan par routes ke hisaab se alag alag page ka content dikhata hai. Jaise agar /inbox par ho to Inbox component yahin render hoga. */}
-            <Outlet />
+            <Sidebar onEmailSent={onEmailSent} />
+            {/* Outlet me Inbox ko refreshKey prop pass karne ke liye clone karenge */}
+            <Outlet context={{ refreshKey }} />
         </div>
     )
 }

@@ -1,36 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdDeleteOutline, MdOutlineMarkEmailRead } from 'react-icons/md';
 import { BiArchiveIn } from 'react-icons/bi';
 
-const dummyEmails = [
-  { id: '1', to: 'alice@example.com', subject: 'Welcome!', message: 'Hello Alice, welcome to Gmail!', createdAt: { seconds: Date.now() / 1000 }, read: false },
-  { id: '2', to: 'bob@example.com', subject: 'React Project', message: 'Hi Bob, here is your React project update.', createdAt: { seconds: Date.now() / 1000 }, read: false },
-  { id: '3', to: 'carol@example.com', subject: 'Meeting Reminder', message: 'Don’t forget our meeting at 3pm today.', createdAt: { seconds: Date.now() / 1000 }, read: false },
-  { id: '4', to: 'dave@example.com', subject: 'Invoice Attached', message: 'Please find the attached invoice for your records.', createdAt: { seconds: Date.now() / 1000 }, read: false },
-  { id: '5', to: 'eve@example.com', subject: 'Party Invitation', message: 'You are invited to the party this weekend!', createdAt: { seconds: Date.now() / 1000 }, read: false },
-];
 
-const Messages = () => {
+// Backend se emails fetch karne ke liye
+const fetchEmails = async () => {
+  const token = localStorage.getItem('token');
+  const res = await fetch('http://localhost:5000/api/emails', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) return [];
+  return await res.json();
+};
+
+
+
+const Messages = ({ refreshKey }) => {
   const [searchText] = useState('');
-  const [emails, setEmails] = useState(dummyEmails);
+  const [emails, setEmails] = useState([]);
+
+  // Emails ko fetch karo jab refreshKey change ho
+  useEffect(() => {
+    fetchEmails().then(setEmails);
+  }, [refreshKey]);
 
   const filterEmail = emails.filter((email) => {
     return (
-      email.subject.toLowerCase().includes(searchText.toLowerCase()) ||
-      email.to.toLowerCase().includes(searchText.toLowerCase()) ||
-      email.message.toLowerCase().includes(searchText.toLowerCase())
+      email.subject?.toLowerCase().includes(searchText.toLowerCase()) ||
+      email.to?.toLowerCase().includes(searchText.toLowerCase()) ||
+      email.body?.toLowerCase().includes(searchText.toLowerCase())
     );
   });
 
   // Hover par delete button dikhane ke liye state
   const [hoveredId, setHoveredId] = useState(null);
+
+  // Email delete karne ka function
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    await fetch(`http://localhost:5000/api/emails/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    setEmails(emails => emails.filter(m => m._id !== id));
+  };
+
   return (
     <div>
       {filterEmail.map((email) => (
         <div
-          key={email.id}
+          key={email._id}
           className="flex items-start justify-between border-b border-gray-200 px-4 py-3 text-sm hover:cursor-pointer hover:shadow-md"
-          onMouseEnter={() => setHoveredId(email.id)}
+          onMouseEnter={() => setHoveredId(email._id)}
           onMouseLeave={() => setHoveredId(null)}
         >
           <div className="flex items-center gap-3">
@@ -41,11 +62,11 @@ const Messages = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="12 17.27 18.18 21 15.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 8.46 13.97 5.82 21 12 17.27" /></svg>
             </div>
             <div>
-              <h1 className={email.read ? '' : 'font-semibold'}>{email?.to}</h1>
+              <h1 className={email.read ? '' : 'font-semibold'}>{email?.from}</h1>
             </div>
           </div>
           <div className="flex-1 ml-4">
-            <p className="text-gray-600 truncate inline-block max-w-full">{`${email.message.length > 130 ? `${email?.message.substring(0, 130)}...` : email.message}`}</p>
+            <p className="text-gray-600 truncate inline-block max-w-full">{`${email.body?.length > 130 ? `${email?.body.substring(0, 130)}...` : email.body}`}</p>
           </div>
           <div className="flex-none text-gray-400 text-sm flex items-center gap-2">
             {hoveredId === email.id ? (
@@ -68,14 +89,14 @@ const Messages = () => {
                   title="Delete"
                   onClick={e => {
                     e.stopPropagation();
-                    setEmails(emails => emails.filter(m => m.id !== email.id));
+                    handleDelete(email._id);
                   }}
                 >
                   <MdDeleteOutline size={20} />
                 </button>
               </>
             ) : (
-              <p>{new Date(email?.createdAt?.seconds * 1000).toUTCString()}</p>
+              <p>{email?.createdAt ? new Date(email.createdAt).toUTCString() : ''}</p>
             )}
           </div>
         </div>

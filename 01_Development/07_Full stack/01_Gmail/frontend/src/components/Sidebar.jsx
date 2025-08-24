@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ComposePopup from './ComposePopup';
 import { LuPencil } from "react-icons/lu";
 import { IoMdStar } from "react-icons/io";
 import { MdOutlineWatchLater, MdOutlineKeyboardArrowDown, MdOutlineDrafts, MdInbox } from "react-icons/md";
@@ -28,17 +29,19 @@ const sidebarItems = [
   },
 ]
 
-const Sidebar = () => {
+const Sidebar = ({ onEmailSent }) => {
   const [selected, setSelected] = useState(0);
+  const [showCompose, setShowCompose] = useState(false);
   return (
     <div className='hidden md:block w-64 md:w-[15%] min-w-[64px] max-w-xs transition-all duration-300 bg-white h-full'>
       {/* Compose button */}
       <div className='p-3 pl-3'>
-        <button className='flex items-center gap-2 bg-[#C2E7FF] p-4 rounded-2xl hover:shadow-md'>
+        <button className='flex items-center gap-2 bg-[#C2E7FF] p-4 rounded-2xl hover:shadow-md' onClick={() => setShowCompose(true)}>
           <LuPencil size={"24px"} />
           Compose
         </button>
       </div>
+      {showCompose && <ComposePopup onClose={() => setShowCompose(false)} onSend={onEmailSent} />}
       {/* Sidebar ke sare items */}
       <div className='text-gray-500'>
         {

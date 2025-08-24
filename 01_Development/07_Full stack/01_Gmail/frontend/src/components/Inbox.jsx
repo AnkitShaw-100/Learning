@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useOutletContext } from 'react-router-dom';
 import { MdCropSquare } from "react-icons/md";
 import { FaCaretDown, FaUserFriends } from "react-icons/fa";
 import { IoMdRefresh, IoMdMore } from "react-icons/io";
@@ -21,7 +22,8 @@ const mailType = [
     },
 ];
 
-const Inbox = ({ emails }) => {
+const Inbox = () => {
+    const { refreshKey } = useOutletContext();
     const [mailTypeSelected, setMailTypeSelected] = useState(0);
     return (
         <div className='flex-1 bg-white rounded-xl mx-5'>
@@ -59,7 +61,7 @@ const Inbox = ({ emails }) => {
                         )
                     }
                 </div>
-                <Messages />
+                <Messages refreshKey={refreshKey} />
             </div>
         </div>
     )
