@@ -1,0 +1,53 @@
+import express from "express";
+
+import Email from "../models/Email.js";
+import auth from "../middlewares/auth.js";
+import { validateBody } from "../middlewares/validate.js";
+import { createEmailSchema } from "../validators/emailValidator.js";
+
+const router = express.Router();
+
+
+// Create a new email (send email)
+router.post("/", auth, validateBody(createEmailSchema), async (req, res) => {
+  try {
+    const { to, subject, body } = req.body;
+    // 'from' is set from logged-in user
+    const from = req.user.email;
+    const email = new Email({ from, to, subject, body });
+    await email.save();
+    res.status(201).json(email);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all emails for the logged-in user (inbox)
+router.get("/", auth, async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    // Find emails where 'to' is the logged-in user
+    const emails = await Email.find({ to: userEmail }).sort({ createdAt: -1 });
+    res.json(emails);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+// (Optional) Mark email as read
+router.patch("/:id/read", auth, async (req, res) => {
+  try {
+    const email = await Email.findById(req.params.id);
+    if (!email) return res.status(404).json({ message: "Email not found" });
+    // Only recipient can mark as read
+    if (email.to !== req.user.email) return res.status(403).json({ message: "Not allowed" });
+    email.read = true;
+    await email.save();
+    res.json(email);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+export default router;
