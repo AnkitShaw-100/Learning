@@ -1,17 +1,17 @@
-import React from 'react'
-import Sidebar from './Sidebar'
-import { Outlet } from 'react-router-dom'
-import Navbar from './Navbar'
-
+import React, { useState } from 'react';
+import Sidebar from './Sidebar';
+import Messages from './Messages';
 
 const Body = ({ refreshKey, onEmailSent }) => {
+    const [selectedTab, setSelectedTab] = useState(0); // 0: Inbox, 3: Sent
     return (
-        <div className='flex'>
-            <Sidebar onEmailSent={onEmailSent} />
-            {/* Outlet me Inbox ko refreshKey prop pass karne ke liye clone karenge */}
-            <Outlet context={{ refreshKey }} />
+        <div className='flex w-full'>
+            <Sidebar onEmailSent={onEmailSent} onSelect={setSelectedTab} />
+            <div className='flex-1'>
+                <Messages refreshKey={refreshKey} selectedTab={selectedTab} />
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default Body
+export default Body;

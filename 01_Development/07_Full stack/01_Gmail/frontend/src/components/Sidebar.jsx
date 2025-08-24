@@ -29,7 +29,7 @@ const sidebarItems = [
   },
 ]
 
-const Sidebar = ({ onEmailSent }) => {
+const Sidebar = ({ onEmailSent, onSelect }) => {
   const [selected, setSelected] = useState(0);
   const [showCompose, setShowCompose] = useState(false);
   return (
@@ -47,7 +47,7 @@ const Sidebar = ({ onEmailSent }) => {
         {
           sidebarItems.map((item, idx) => {
             return (
-              <div onClick={() => setSelected(idx)} key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-10 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer px-10`}>
+              <div onClick={() => { setSelected(idx); if (onSelect) onSelect(idx); }} key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-10 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer px-10`}>
                 {item.icon}
                 <p className={selected === idx ? 'font-bold' : ''}>{item.text}</p>
               </div>
