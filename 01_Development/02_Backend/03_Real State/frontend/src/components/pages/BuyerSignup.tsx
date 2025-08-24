@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FaGithub, FaFacebookF } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import image3 from "../../assets/exterior/image3.jpg";
@@ -239,29 +238,6 @@ const BuyerSignup: React.FC = () => {
             <span className="px-4 text-sm text-gray-400">OR</span>
             <div className="flex-grow h-px bg-gray-300"></div>
           </motion.div>
-
-          {/* Social Login */}
-          <motion.div className="flex justify-center space-x-4" variants={itemVariants}>
-            <button
-              className="p-3 border border-gray-300 rounded-full bg-white shadow-sm transition hover:scale-105 focus:ring-2 focus:ring-gray-400"
-              aria-label="Sign up with GitHub"
-            >
-              <FaGithub className="text-gray-700 text-xl" />
-            </button>
-            <button
-              className="p-3 border border-gray-300 rounded-full bg-white shadow-sm transition hover:scale-105 focus:ring-2 focus:ring-blue-300"
-              aria-label="Sign up with Facebook"
-            >
-              <FaFacebookF className="text-blue-600 text-xl" />
-            </button>
-          </motion.div>
-
-          <motion.p className="text-sm text-center mt-6 text-gray-500" variants={itemVariants}>
-            Already have an account?{" "}
-            <a href="/login" className="text-blue-800 font-medium hover:underline">
-              Log in
-            </a>
-          </motion.p>
 
           {/* Seller Redirect */}
           <motion.button

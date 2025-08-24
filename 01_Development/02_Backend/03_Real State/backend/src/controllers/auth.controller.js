@@ -54,11 +54,17 @@ export const registerUser = async (req, res) => {
     const user = await User.create({ name, email, password: hashedPassword, role });
 
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id, user.role)
+      success: true,
+      data: {
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        },
+        token: generateToken(user._id, user.role)
+      },
+      message: "User registered successfully"
     });
   } catch (err) {
     console.error("registerUser error:", err);
@@ -76,11 +82,17 @@ export const loginUser = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id, user.role)
+      success: true,
+      data: {
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        },
+        token: generateToken(user._id, user.role)
+      },
+      message: "Login successful"
     });
   } catch (err) {
     console.error("loginUser error:", err);
