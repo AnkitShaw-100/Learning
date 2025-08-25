@@ -13,17 +13,14 @@ import TestIntegration from './components/pages/TestIntegration'
 import TestConnection from './components/pages/TestConnection'
 import AboutUs from './components/pages/AboutUs'
 import ContactUs from './components/pages/ContactUs'
-import PropertyDetails from './components/pages/PropertyDetails'
 import PropertyListing from './components/pages/PropertyListing'
-import PropertyDetailPage from './components/pages/PropertyDetailPage'
+import DummyPropertyDetailPage from './components/pages/DummyPropertyDetailPage'
 import AddProperty from './components/pages/AddProperty'
 import SellerDashboard from './components/pages/SellerDashboard'
 import BuyerDashboard from './components/pages/BuyerDashboard'
-import EditProperty from './components/pages/EditProperty'
 import FavoritesPage from './components/pages/FavoritesPage'
 
 import './App.css'
-import PropertyDisplayPage from './components/pages/PropertyDisplayPage'
 
 const HomePage = () => {
   return (
@@ -32,14 +29,15 @@ const HomePage = () => {
       <Benefits />
       <RecommendedResidences />
       <TestimonialsPage />
-      <PropertyDetails />
+      <PropertyListing />
     </>
   )
 }
 
+
 function App() {
   const location = useLocation()
-  const hideNavAndFooter = location.pathname === "/property"
+  const hideNavAndFooter = location.pathname === "/properties" || location.pathname.startsWith("/property/")
 
   return (
     <AuthProvider>
@@ -47,7 +45,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/property" element={<PropertyDisplayPage />} />
+        <Route path="/properties" element={<PropertyListing />} />
         <Route path="/services" element={<Benefits />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/about" element={<AboutUs />} />
@@ -58,9 +56,8 @@ function App() {
         <Route path="/test-connection" element={<TestConnection />} />
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
         <Route path="/seller/add-property" element={<AddProperty />} />
-        <Route path="/seller/edit-property/:id" element={<EditProperty />} />
         <Route path="/properties" element={<PropertyListing />} />
-        <Route path="/properties/:id" element={<PropertyDetailPage />} />
+        <Route path="/property/:id" element={<DummyPropertyDetailPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
       </Routes>

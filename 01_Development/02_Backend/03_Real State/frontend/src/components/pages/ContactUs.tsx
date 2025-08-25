@@ -61,7 +61,7 @@ const ContactUs: React.FC = () => {
       } else {
         setSubmitStatus("error");
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -114,7 +114,6 @@ const ContactUs: React.FC = () => {
                   <div>
                     <h3 className="font-medium text-gray-800">Email</h3>
                     <p className="text-gray-600">info@realstatem.com</p>
-                    <p className="text-gray-600">support@realstatem.com</p>
                   </div>
                 </div>
 
@@ -125,7 +124,6 @@ const ContactUs: React.FC = () => {
                   <div>
                     <h3 className="font-medium text-gray-800">Phone</h3>
                     <p className="text-gray-600">+91 98765 43210</p>
-                    <p className="text-gray-600">+91 98765 43211</p>
                   </div>
                 </div>
 
@@ -151,7 +149,6 @@ const ContactUs: React.FC = () => {
                     <h3 className="font-medium text-gray-800">Business Hours</h3>
                     <p className="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
                     <p className="text-gray-600">Saturday: 10:00 AM - 4:00 PM</p>
-                    <p className="text-gray-600">Sunday: Closed</p>
                   </div>
                 </div>
               </div>

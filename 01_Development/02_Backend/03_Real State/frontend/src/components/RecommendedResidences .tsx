@@ -1,3 +1,5 @@
+
+import { useNavigate } from "react-router-dom";
 import image1 from "../assets/interior/image1.jpg";
 import image2 from "../assets/interior/image2.jpg";
 import image3 from "../assets/interior/image3.jpg";
@@ -84,11 +86,11 @@ const residences = [
     rating: 4.7,
     reviews: 92,
     readyToMove: false,
-    possession: "Mar 2025"
   }
 ];
 
 const RecommendedResidences = () => {
+  const navigate = useNavigate();
   return (
     <section className="w-full bg-gray-50 px-4 sm:px-8 py-16 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -103,7 +105,10 @@ const RecommendedResidences = () => {
               Each property is vetted for quality and value.
             </p>
           </div>
-          <button className="bg-blue-900 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2">
+          <button
+            className="bg-blue-900 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2"
+            onClick={() => navigate('/properties')}
+          >
             Explore All Properties
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -116,7 +121,7 @@ const RecommendedResidences = () => {
           {residences.map((res, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100"
             >
               {/* Image with Badge */}
               <div className="relative">
@@ -126,19 +131,19 @@ const RecommendedResidences = () => {
                   className="h-64 w-full object-cover"
                 />
                 {res.readyToMove ? (
-                  <div className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute top-4 left-4 bg-green-500/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                     Ready to Move
                   </div>
                 ) : (
-                  <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute top-4 left-4 bg-amber-500/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                     Under Construction
                   </div>
                 )}
-                <div className="absolute bottom-4 right-4 bg-blue-900 text-white text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <div className="absolute top-4 right-4 bg-white/90 text-blue-900 text-xs font-semibold px-3 py-1 rounded-full shadow flex items-center gap-1 border border-blue-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  {res.rating} ({res.reviews})
+                  {res.rating} <span className="text-gray-500">({res.reviews})</span>
                 </div>
               </div>
 
@@ -146,27 +151,30 @@ const RecommendedResidences = () => {
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">{res.name}</h3>
-                    <p className="text-sm text-gray-500">{res.location}</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 leading-snug line-clamp-2">{res.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      {res.location}
+                    </p>
                   </div>
-                  <span className="text-blue-900 font-bold text-xl">
+                  <span className="text-blue-900 font-extrabold text-lg sm:text-xl whitespace-nowrap">
                     {res.price}
                   </span>
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <span className="bg-blue-100 text-blue-900 text-xs px-3 py-1 rounded-full">{res.type}</span>
-                  <span className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full">{res.area}</span>
+                  <span className="bg-blue-100 text-blue-900 text-xs px-3 py-1 rounded-full font-semibold border border-blue-200">{res.type}</span>
+                  <span className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full font-semibold border border-gray-200">{res.area}</span>
                   {!res.readyToMove && (
-                    <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full">Possession: {res.possession}</span>
+                    <span className="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-semibold border border-amber-200">Possession: {res.possession}</span>
                   )}
                 </div>
 
                 <div className="border-t border-gray-100 pt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Amenities:</h4>
+                  <h4 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">Key Amenities</h4>
                   <div className="flex flex-wrap gap-2">
                     {res.amenities.slice(0, 4).map((amenity, i) => (
-                      <span key={i} className="bg-gray-50 text-gray-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                      <span key={i} className="bg-green-50 text-green-800 text-xs px-3 py-1 rounded-full flex items-center gap-1 border border-green-100 font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-green-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -177,14 +185,17 @@ const RecommendedResidences = () => {
                 </div>
 
                 <div className="flex gap-3 pt-4">
-                  <button className="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-sm py-2.5 rounded-lg transition-all font-medium flex items-center justify-center gap-2">
+                  <button
+                    className="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-sm py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 shadow transition-transform duration-100 ease-in-out hover:scale-105 focus:scale-105"
+                    onClick={() => navigate(`/property/${index}`)}
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                       <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                     </svg>
                     View Details
                   </button>
-                  <button className="flex-1 border border-blue-900 text-blue-900 hover:bg-blue-50 text-sm py-2.5 rounded-lg transition-all font-medium flex items-center justify-center gap-2">
+                  <button className="flex-1 border border-blue-900 text-blue-900 hover:bg-blue-50 text-sm py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 shadow">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                     </svg>
@@ -198,7 +209,10 @@ const RecommendedResidences = () => {
 
         {/* View More CTA */}
         <div className="mt-16 text-center">
-          <button className="bg-white text-blue-900 border border-blue-900 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 mx-auto">
+          <button
+            className="bg-white text-blue-900 border border-blue-900 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 mx-auto"
+            onClick={() => navigate('/properties')}
+          >
             Load More Properties
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />

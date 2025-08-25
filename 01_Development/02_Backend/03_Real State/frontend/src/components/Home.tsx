@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import homePage from "../assets/homePage.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+    const navigate = useNavigate();
 
     return (
         <div className="w-full bg-gray-50 font-sans">
@@ -50,6 +52,7 @@ const Home = () => {
                     </p>
                     <button
                         className="px-6 py-3 bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-lg transition-all shadow-md"
+                        onClick={() => navigate('/properties')}
                     >
                         See Our Projects
                     </button>
