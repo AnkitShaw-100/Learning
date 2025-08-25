@@ -21,6 +21,7 @@ router.post("/", auth, validateBody(createEmailSchema), async (req, res) => {
   }
 });
 
+// Get all emails for the logged-in user (inbox)
 // Get all emails for the logged-in user (inbox and sent)
 router.get("/", auth, async (req, res) => {
   try {
@@ -65,6 +66,24 @@ router.delete("/:id", auth, async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     await email.deleteOne();
     res.json({ message: "Email deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add a reply to an email (conversation)
+router.patch("/:id/reply", auth, async (req, res) => {
+  try {
+    const email = await Email.findById(req.params.id);
+    if (!email) return res.status(404).json({ message: "Email not found" });
+    // Only sender or recipient can reply
+    if (email.to !== req.user.email && email.from !== req.user.email)
+      return res.status(403).json({ message: "Not allowed" });
+    const { body } = req.body;
+    if (!body || !body.trim()) return res.status(400).json({ message: "Reply body required" });
+    email.replies.push({ from: req.user.email, body });
+    await email.save();
+    res.json(email);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

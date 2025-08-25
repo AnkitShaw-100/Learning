@@ -23,10 +23,6 @@ const sidebarItems = [
     icon: <TbSend2 size={"20px"} />,
     text: "Sent"
   },
-  {
-    icon: <MdOutlineDrafts size={"20px"} />,
-    text: "Drafts"
-  },
 ]
 
 const Sidebar = ({ onEmailSent, onSelect }) => {
@@ -46,6 +42,16 @@ const Sidebar = ({ onEmailSent, onSelect }) => {
       <div className='text-gray-500'>
         {
           sidebarItems.map((item, idx) => {
+            // Hide all mails in Drafts tab (show empty or custom message)
+            if (item.isDraft && selected === idx) {
+              return (
+                <div key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-10 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer px-10`}>
+                  {item.icon}
+                  <p className={selected === idx ? 'font-bold' : ''}>{item.text}</p>
+                  <span className="ml-4 text-gray-400 text-xs">(No drafts)</span>
+                </div>
+              );
+            }
             return (
               <div onClick={() => { setSelected(idx); if (onSelect) onSelect(idx); }} key={idx} className={`${selected === idx ? 'bg-[#C2E7FF] text-black' : "hover:bg-gray-200 hover:text-black"} flex pl-10 py-1 rounded-r-full items-center gap-4 my-2  hover:cursor-pointer px-10`}>
                 {item.icon}

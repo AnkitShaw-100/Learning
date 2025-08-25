@@ -1,10 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const MailDetail = ({ email, onClose }) => {
   const [showReply, setShowReply] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const [mailData, setMailData] = useState(email);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  if (!email) return null;
+  // Fetch latest email with replies
+  const fetchMail = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails/${email._id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMailData(data);
+      }
+    } catch (err) {
+
+      console.error('Failed to fetch mail:', err);
+    }
+  };
+
+  useEffect(() => {
+    setMailData(email);
+  }, [email]);
+
+  // Send reply and update conversation
+  const handleReplySend = async () => {
+    if (!replyText.trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails/${email._id}/reply`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ body: replyText })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || 'Failed to send reply');
+        setLoading(false);
+        return;
+      }
+      setReplyText("");
+      setShowReply(false);
+      setSuccess("Mail sent!");
+      setTimeout(() => setSuccess(""), 2500);
+      await fetchMail();
+    } catch {
+      setError('Failed to send reply');
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="w-full h-full bg-white rounded-lg shadow-md border border-gray-200 flex flex-col">
@@ -101,9 +156,9 @@ const MailDetail = ({ email, onClose }) => {
             <span className="text-xs text-gray-500">
               {email.createdAt
                 ? new Date(email.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : ""}
             </span>
           </div>
@@ -113,13 +168,33 @@ const MailDetail = ({ email, onClose }) => {
         </div>
       </div>
 
-      {/* Body */}
+
+      {/* Conversation (original + replies) */}
       <div className="flex-1 overflow-y-auto px-8 pt-4 pb-6 text-gray-800 whitespace-pre-line text-[15px] leading-relaxed">
-        {email.body}
+        {/* Original message */}
+        <div className="mb-6">
+          <div className="font-semibold text-gray-900">{mailData.from}</div>
+          <div className="text-xs text-gray-500 mb-1">{mailData.createdAt ? new Date(mailData.createdAt).toLocaleString() : ""}</div>
+          <div>{mailData.body}</div>
+        </div>
+        {/* Replies */}
+        {mailData.replies && mailData.replies.length > 0 && (
+          <div className="space-y-6">
+            {mailData.replies.map((reply, idx) => (
+              <div key={idx} className="border-l-4 border-blue-200 pl-4">
+                <div className="font-semibold text-blue-700">{reply.from}</div>
+                <div className="text-xs text-gray-400 mb-1">{reply.createdAt ? new Date(reply.createdAt).toLocaleString() : ""}</div>
+                <div>{reply.body}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Reply Section */}
       <div className="border-t border-gray-200 px-8 py-4 bg-gray-50">
+        {success && <div className="text-green-600 text-sm mb-2 font-medium">{success}</div>}
+        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
         {!showReply ? (
           <button
             onClick={() => setShowReply(true)}
@@ -134,14 +209,20 @@ const MailDetail = ({ email, onClose }) => {
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Write your reply..."
               className="w-full h-28 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              disabled={loading}
             />
             <div className="mt-3 flex gap-2">
-              <button className="px-5 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 transition shadow-sm">
-                Send
+              <button
+                className="px-5 py-2 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 transition shadow-sm"
+                onClick={handleReplySend}
+                disabled={loading}
+              >
+                {loading ? 'Sending...' : 'Send'}
               </button>
               <button
                 onClick={() => setShowReply(false)}
                 className="px-5 py-2 bg-gray-200 text-gray-700 rounded-full text-sm hover:bg-gray-300 transition"
+                disabled={loading}
               >
                 Cancel
               </button>

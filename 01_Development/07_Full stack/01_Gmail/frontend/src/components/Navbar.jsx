@@ -52,11 +52,27 @@ const Navbar = ({ onLogout }) => {
       {/* Desktop Right Icons */}
       <div className="hidden md:block p-10">
         <div className="flex items-center gap-2">
-          <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
-            <FaRegQuestionCircle size={"20px"} />
+          {/* Help Dropdown */}
+          <div className="relative group">
+            <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
+              <FaRegQuestionCircle size={"20px"} />
+            </div>
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">Help Center</button>
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">Send Feedback</button>
+            </div>
           </div>
-          <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
-            <IoSettingsOutline size={"20px"} />
+          {/* Settings Dropdown - Minimal UI to match Help Dropdown */}
+          <div className="relative group">
+            <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
+              <IoSettingsOutline size={"20px"} />
+            </div>
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">See all settings</button>
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">Themes</button>
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">Inbox type</button>
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">Density</button>
+            </div>
           </div>
           <div className="p-3 rounded-full hover:bg-gray-100 cursor-pointer">
             <PiDotsNineBold size={"20px"} />
