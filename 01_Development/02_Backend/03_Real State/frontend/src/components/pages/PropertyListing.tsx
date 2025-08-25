@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaSort, FaFilter, FaMap, FaList } from "react-icons/fa";
+import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaFilter, FaMap, FaList } from "react-icons/fa";
 import apiClient from "../../services/api.ts";
 
 interface Property {

@@ -29,7 +29,6 @@ const HomePage = () => {
       <Benefits />
       <RecommendedResidences />
       <TestimonialsPage />
-      <PropertyListing />
     </>
   )
 }

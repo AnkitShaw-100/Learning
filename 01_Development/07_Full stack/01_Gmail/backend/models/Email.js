@@ -6,7 +6,8 @@ const emailSchema = new mongoose.Schema(
     to: { type: String, required: true }, // recipient's email
     subject: { type: String, required: true },
     body: { type: String, required: true },
-    read: { type: Boolean, default: false },
+  read: { type: Boolean, default: false },
+  starred: { type: Boolean, default: false },
   },
   {
     timestamps: true,

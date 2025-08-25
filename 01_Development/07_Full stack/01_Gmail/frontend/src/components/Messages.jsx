@@ -5,7 +5,7 @@ import { MdDeleteOutline, MdOutlineMarkEmailRead } from 'react-icons/md';
 // Backend se emails fetch karne ke liye
 const fetchEmails = async () => {
   const token = localStorage.getItem('token');
-  const res = await fetch('http://localhost:5000/api/emails', {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails`, {
     headers: { 'Authorization': `Bearer ${token}` }
   });
   if (!res.ok) return [];
@@ -13,6 +13,11 @@ const fetchEmails = async () => {
 };
 
 const tabNames = ["Primary", "Social", "Promotions"];
+const SIDEBAR_TABS = {
+  INBOX: 0,
+  STARRED: 1,
+  SENT: 3,
+};
 
 const Messages = ({ refreshKey, selectedTab }) => {
   const [emails, setEmails] = useState([]);
@@ -26,13 +31,22 @@ const Messages = ({ refreshKey, selectedTab }) => {
     fetchEmails().then(setEmails);
   }, [refreshKey]);
 
-  // Inbox vs Sent
+  // Inbox, Starred, Sent filtering
   let filtered = emails;
-  if (selectedTab === 0) {
+  if (selectedTab === SIDEBAR_TABS.INBOX) {
     filtered = emails.filter(email => email.to === userEmail);
-  } else if (selectedTab === 3) {
+  } else if (selectedTab === SIDEBAR_TABS.STARRED) {
+    filtered = emails.filter(email => email.starred && (email.to === userEmail || email.from === userEmail));
+  } else if (selectedTab === SIDEBAR_TABS.SENT) {
     filtered = emails.filter(email => email.from === userEmail);
   }
+
+
+  // Checkbox state
+  const [checkedIds, setCheckedIds] = useState([]);
+  const handleCheckbox = (id) => {
+    setCheckedIds(ids => ids.includes(id) ? ids.filter(i => i !== id) : [...ids, id]);
+  };
 
   // Tab filtering logic
   let filterEmail = filtered;
@@ -45,7 +59,8 @@ const Messages = ({ refreshKey, selectedTab }) => {
   // Mark as read
   const handleMarkAsRead = async (id) => {
     const token = localStorage.getItem('token');
-    await fetch(`http://localhost:5000/api/emails/${id}/read`, {
+    import.meta.env.VITE_BACKEND_URL
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails/${id}/read`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -55,7 +70,7 @@ const Messages = ({ refreshKey, selectedTab }) => {
   // Delete
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
-    await fetch(`http://localhost:5000/api/emails/${id}`, {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -101,66 +116,73 @@ const Messages = ({ refreshKey, selectedTab }) => {
       </div>
 
       {/* Email list */}
-      {filterEmail.map((email) => (
-        <div
-          key={email._id}
-          className="flex items-start justify-between border-b border-gray-200 px-4 py-3 text-sm hover:cursor-pointer hover:bg-gray-50 group"
-          onMouseEnter={() => setHoveredId(email._id)}
-          onMouseLeave={() => setHoveredId(null)}
-          onClick={() => setOpenMail(email)}
-        >
-          <div className="flex items-center gap-3">
-            {/* Checkbox */}
-            <div className="flex-none text-gray-300">
-              <input type="checkbox" className="w-4 h-4" />
+      {filterEmail.map((email) => {
+        const checked = checkedIds.includes(email._id);
+        return (
+          <div
+            key={email._id}
+            className={`flex items-start justify-between border-b border-gray-200 px-4 py-3 text-sm hover:cursor-pointer hover:bg-gray-50 group ${checked ? 'bg-blue-50' : ''}`}
+            onMouseEnter={() => setHoveredId(email._id)}
+            onMouseLeave={() => setHoveredId(null)}
+            onClick={() => setOpenMail(email)}
+          >
+            <div className="flex items-center gap-3">
+              {/* Checkbox */}
+              <div className="flex-none text-gray-300">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4"
+                  checked={checked}
+                  onChange={e => {
+                    e.stopPropagation();
+                    handleCheckbox(email._id);
+                  }}
+                  onClick={e => e.stopPropagation()}
+                />
+              </div>
+
+              <div>
+                <h1 className={email.read ? '' : 'font-semibold'}>{email?.from}</h1>
+              </div>
             </div>
-            {/* Star */}
-            <div className="flex-none text-gray-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <polygon points="12 17.27 18.18 21 15.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 8.46 13.97 5.82 21 12 17.27" />
-              </svg>
+            <div className="flex-1 ml-4">
+              <p className="text-gray-600 truncate inline-block max-w-full">
+                {email.body?.length > 130 ? `${email?.body.substring(0, 130)}...` : email.body}
+              </p>
             </div>
-            <div>
-              <h1 className={email.read ? '' : 'font-semibold'}>{email?.from}</h1>
-            </div>
+            {/* Hover actions: show if hovered or checked */}
+            {(hoveredId === email._id || checked) ? (
+              <div className="flex-none text-gray-400 text-sm flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                <button
+                  className="hover:bg-gray-100 p-1 rounded"
+                  title="Mark as Read"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleMarkAsRead(email._id);
+                  }}
+                  disabled={email.read}
+                >
+                  <MdOutlineMarkEmailRead size={20} className={email.read ? 'text-green-400' : ''} />
+                </button>
+                <button
+                  className="hover:bg-red-100 p-1 rounded text-red-500"
+                  title="Delete"
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleDelete(email._id);
+                  }}
+                >
+                  <MdDeleteOutline size={20} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex-none text-gray-400 text-xs ml-2 min-w-[120px] text-right">
+                {email?.createdAt ? new Date(email.createdAt).toLocaleString() : ''}
+              </div>
+            )}
           </div>
-          <div className="flex-1 ml-4">
-            <p className="text-gray-600 truncate inline-block max-w-full">
-              {email.body?.length > 130 ? `${email?.body.substring(0, 130)}...` : email.body}
-            </p>
-          </div>
-          {/* Hover actions */}
-          {hoveredId === email._id ? (
-            <div className="flex-none text-gray-400 text-sm flex items-center gap-2" onClick={e => e.stopPropagation()}>
-              <button
-                className="hover:bg-gray-100 p-1 rounded"
-                title="Mark as Read"
-                onClick={e => {
-                  e.stopPropagation();
-                  handleMarkAsRead(email._id);
-                }}
-                disabled={email.read}
-              >
-                <MdOutlineMarkEmailRead size={20} className={email.read ? 'text-green-400' : ''} />
-              </button>
-              <button
-                className="hover:bg-red-100 p-1 rounded text-red-500"
-                title="Delete"
-                onClick={e => {
-                  e.stopPropagation();
-                  handleDelete(email._id);
-                }}
-              >
-                <MdDeleteOutline size={20} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex-none text-gray-400 text-xs ml-2 min-w-[120px] text-right">
-              {email?.createdAt ? new Date(email.createdAt).toLocaleString() : ''}
-            </div>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

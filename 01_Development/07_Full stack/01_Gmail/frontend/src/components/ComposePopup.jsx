@@ -13,7 +13,7 @@ const ComposePopup = ({ onClose, onSend }) => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/emails', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/emails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
