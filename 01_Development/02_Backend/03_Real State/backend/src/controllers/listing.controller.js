@@ -1,5 +1,3 @@
-
-// @desc Get all listings for a specific user (owner)
 export const getUserListings = async (req, res) => {
   try {
     const listings = await Listing.find({ owner: req.user.id }).sort({ createdAt: -1 });

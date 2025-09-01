@@ -1,4 +1,3 @@
-
 import express from "express";
 import { protect } from "../middleware/auth.js";
 import { authorize } from "../middleware/authorize.js";
@@ -9,7 +8,7 @@ import {
   getListing,
   updateListing,
   deleteListing,
-  getUserListings
+  getUserListings,
 } from "../controllers/listing.controller.js";
 
 const router = express.Router();

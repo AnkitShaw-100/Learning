@@ -6,9 +6,6 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import listingRoutes from "./routes/listing.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
-import transactionRoutes from "./routes/transaction.routes.js";
-
-import messageRoutes from "./routes/message.routes.js";
 import propertyRoutes from "./routes/listing.routes.js";
 
 dotenv.config();
@@ -34,9 +31,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../../uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/favorites", favoriteRoutes);
-app.use("/api/transactions", transactionRoutes);
 
-app.use("/api/messages", messageRoutes);
 app.use("/api/properties", propertyRoutes);
 
 app.get("/", (req, res) => {

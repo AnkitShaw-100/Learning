@@ -45,7 +45,9 @@ async function insertDummyProperties() {
     // Check if OWNER_ID is valid
     const owner = await User.findById(OWNER_ID);
     if (!owner) {
-      throw new Error("Please set OWNER_ID to a valid user ID from your database.");
+      throw new Error(
+        "Please set OWNER_ID to a valid user ID from your database."
+      );
     }
 
     await Property.insertMany(dummyProperties);

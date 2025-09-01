@@ -31,7 +31,7 @@ export const removeFavorite = async (req, res) => {
 
     const user = await User.findById(req.user.id);
 
-    user.favorites = user.favorites.filter(id => id.toString() !== listingId);
+    user.favorites = user.favorites.filter((id) => id.toString() !== listingId);
     await user.save();
 
     res.json({ message: "Removed from favorites", favorites: user.favorites });

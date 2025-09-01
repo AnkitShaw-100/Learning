@@ -25,7 +25,7 @@ const propertySchema = new mongoose.Schema(
     },
     images: [
       {
-        type: String, // store image URLs
+        type: String, // stores image URLs
       },
     ],
   },

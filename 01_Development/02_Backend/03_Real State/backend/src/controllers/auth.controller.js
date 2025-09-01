@@ -28,7 +28,8 @@ export const resetPassword = async (req, res) => {
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });
-    if (!user) return res.status(400).json({ message: "Invalid or expired token" });
+    if (!user)
+      return res.status(400).json({ message: "Invalid or expired token" });
 
     user.password = await bcrypt.hash(password, 10);
     user.resetPasswordToken = undefined;
@@ -51,7 +52,12 @@ export const registerUser = async (req, res) => {
     if (exists) return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword, role });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
 
     res.status(201).json({
       success: true,
@@ -60,11 +66,11 @@ export const registerUser = async (req, res) => {
           _id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
-        token: generateToken(user._id, user.role)
+        token: generateToken(user._id, user.role),
       },
-      message: "User registered successfully"
+      message: "User registered successfully",
     });
   } catch (err) {
     console.error("registerUser error:", err);
@@ -79,7 +85,8 @@ export const loginUser = async (req, res) => {
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     res.json({
       success: true,
@@ -88,11 +95,11 @@ export const loginUser = async (req, res) => {
           _id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
-        token: generateToken(user._id, user.role)
+        token: generateToken(user._id, user.role),
       },
-      message: "Login successful"
+      message: "Login successful",
     });
   } catch (err) {
     console.error("loginUser error:", err);

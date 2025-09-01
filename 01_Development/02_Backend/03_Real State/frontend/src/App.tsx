@@ -9,8 +9,6 @@ import Footer from './components/Footer'
 import BuyerSignup from "./components/pages/BuyerSignup"
 import SellerSignup from './components/pages/SellerSignup'
 import Login from './components/pages/Login'
-import TestIntegration from './components/pages/TestIntegration'
-import TestConnection from './components/pages/TestConnection'
 import AboutUs from './components/pages/AboutUs'
 import ContactUs from './components/pages/ContactUs'
 import PropertyListing from './components/pages/PropertyListing'
@@ -51,8 +49,6 @@ function App() {
         <Route path="/signup/buyer" element={<BuyerSignup />} />
         <Route path="/signup/seller" element={<SellerSignup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/test" element={<TestIntegration />} />
-        <Route path="/test-connection" element={<TestConnection />} />
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
         <Route path="/seller/add-property" element={<AddProperty />} />
         <Route path="/properties" element={<PropertyListing />} />
