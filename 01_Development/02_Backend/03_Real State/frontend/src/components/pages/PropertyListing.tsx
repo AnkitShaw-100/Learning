@@ -226,34 +226,32 @@ const PropertyListing: React.FC = () => {
                   <FaFilter className="mr-2" />
                   {showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters
                 </button>
-                
+
                 {/* View Mode Toggle */}
                 <div className="flex items-center bg-gray-100 rounded-lg p-1">
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      viewMode === "list" 
-                        ? "bg-white text-blue-600 shadow-sm" 
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
+                        ? "bg-white text-blue-600 shadow-sm"
                         : "text-gray-600 hover:text-gray-800"
-                    }`}
+                      }`}
                   >
                     <FaList className="inline mr-1" />
                     List
                   </button>
                   <button
                     onClick={() => setViewMode("map")}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      viewMode === "map" 
-                        ? "bg-white text-blue-600 shadow-sm" 
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "map"
+                        ? "bg-white text-blue-600 shadow-sm"
                         : "text-gray-600 hover:text-gray-800"
-                    }`}
+                      }`}
                   >
                     <FaMap className="inline mr-1" />
                     Map
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <select
                   value={sortBy}
@@ -265,7 +263,7 @@ const PropertyListing: React.FC = () => {
                   <option value="area">Area</option>
                   <option value="bedrooms">Bedrooms</option>
                 </select>
-                
+
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value)}
@@ -291,7 +289,7 @@ const PropertyListing: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Max Price (₹)</label>
                   <input
@@ -347,7 +345,7 @@ const PropertyListing: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Max Area (sq ft)</label>
                   <input
@@ -371,7 +369,7 @@ const PropertyListing: React.FC = () => {
                   Clear All
                 </button>
               </div>
-              
+
               <div className="text-sm text-gray-600">
                 {pagination && `${pagination.totalItems} properties found`}
               </div>
@@ -419,7 +417,7 @@ const PropertyListing: React.FC = () => {
               {properties.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-600">No properties found matching your criteria.</p>
-                  <button 
+                  <button
                     onClick={clearFilters}
                     className="mt-4 text-blue-600 hover:text-blue-700 underline"
                   >
@@ -447,9 +445,8 @@ const PropertyListing: React.FC = () => {
                               className="w-full h-full object-cover"
                             />
                             <div className="absolute top-4 right-4">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                              }`}>
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
                                 {property.status}
                               </span>
                             </div>
@@ -481,7 +478,7 @@ const PropertyListing: React.FC = () => {
                               </div>
                               <div className="flex space-x-2">
                                 {property.coordinates && (
-                                  <button 
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setViewMode("map");
@@ -523,7 +520,7 @@ const PropertyListing: React.FC = () => {
                               Properties with location data are shown below
                             </p>
                           </div>
-                          
+
                           {/* Interactive Map Placeholder */}
                           <div className="h-96 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
                             <div className="text-center">
@@ -537,7 +534,7 @@ const PropertyListing: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Properties List for Map View */}
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {properties.map((property) => (
@@ -608,13 +605,13 @@ const PropertyListing: React.FC = () => {
                   >
                     Previous
                   </button>
-                  
+
                   {/* Page Numbers */}
                   {(() => {
                     const pages = [];
                     const totalPages = pagination.totalPages;
                     const currentPage = pagination.currentPage;
-                    
+
                     // Show first page
                     if (totalPages > 0) {
                       pages.push(
@@ -627,14 +624,14 @@ const PropertyListing: React.FC = () => {
                         </button>
                       );
                     }
-                    
+
                     // Show ellipsis if needed
                     if (currentPage > 4) {
                       pages.push(
                         <span key="ellipsis1" className="px-2 py-2 text-gray-500">...</span>
                       );
                     }
-                    
+
                     // Show pages around current page
                     for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
                       if (i > 1 && i < totalPages) {
@@ -649,14 +646,14 @@ const PropertyListing: React.FC = () => {
                         );
                       }
                     }
-                    
+
                     // Show ellipsis if needed
                     if (currentPage < totalPages - 3) {
                       pages.push(
                         <span key="ellipsis2" className="px-2 py-2 text-gray-500">...</span>
                       );
                     }
-                    
+
                     // Show last page
                     if (totalPages > 1) {
                       pages.push(
@@ -669,10 +666,10 @@ const PropertyListing: React.FC = () => {
                         </button>
                       );
                     }
-                    
+
                     return pages;
                   })()}
-                  
+
                   <button
                     onClick={() => goToPage(Math.min(pagination.totalPages, (pagination?.currentPage || 1) + 1))}
                     disabled={pagination.currentPage === pagination.totalPages}

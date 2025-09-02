@@ -75,7 +75,7 @@ const SellerDashboard: React.FC = () => {
   const handleStatusChange = async (propertyId: string, newStatus: string) => {
     try {
       await apiClient.updateProperty(propertyId, { status: newStatus });
-      setProperties(properties.map(p => 
+      setProperties(properties.map(p =>
         p._id === propertyId ? { ...p, status: newStatus } : p
       ));
     } catch (error) {
@@ -219,15 +219,14 @@ const SellerDashboard: React.FC = () => {
                           <select
                             value={property.status}
                             onChange={(e) => handleStatusChange(property._id, e.target.value)}
-                            className={`px-2 py-1 text-xs font-semibold rounded-full border-0 focus:ring-2 focus:ring-blue-500 ${
-                              property.status === 'active' 
-                                ? 'bg-green-100 text-green-800' 
+                            className={`px-2 py-1 text-xs font-semibold rounded-full border-0 focus:ring-2 focus:ring-blue-500 ${property.status === 'active'
+                                ? 'bg-green-100 text-green-800'
                                 : property.status === 'sold'
-                                ? 'bg-red-100 text-red-800'
-                                : property.status === 'rented'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
+                                  ? 'bg-red-100 text-red-800'
+                                  : property.status === 'rented'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}
                           >
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>

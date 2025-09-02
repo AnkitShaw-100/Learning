@@ -12,7 +12,6 @@ import Login from './components/pages/Login'
 import AboutUs from './components/pages/AboutUs'
 import ContactUs from './components/pages/ContactUs'
 import PropertyListing from './components/pages/PropertyListing'
-import DummyPropertyDetailPage from './components/pages/DummyPropertyDetailPage'
 import AddProperty from './components/pages/AddProperty'
 import SellerDashboard from './components/pages/SellerDashboard'
 import BuyerDashboard from './components/pages/BuyerDashboard'
@@ -50,11 +49,10 @@ function App() {
         <Route path="/signup/seller" element={<SellerSignup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/seller/dashboard" element={<SellerDashboard />} />
+        <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
         <Route path="/seller/add-property" element={<AddProperty />} />
         <Route path="/properties" element={<PropertyListing />} />
-        <Route path="/property/:id" element={<DummyPropertyDetailPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
       </Routes>
       {!hideNavAndFooter && <Footer />}
     </AuthProvider>

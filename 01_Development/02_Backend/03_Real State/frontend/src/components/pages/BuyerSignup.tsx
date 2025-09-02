@@ -221,8 +221,8 @@ const BuyerSignup: React.FC = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg font-medium transition ${loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-900 hover:bg-blue-800 text-white"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-900 hover:bg-blue-800 text-white"
                 }`}
               whileHover={!loading ? { scale: 1.02 } : {}}
               whileTap={!loading ? { scale: 0.98 } : {}}

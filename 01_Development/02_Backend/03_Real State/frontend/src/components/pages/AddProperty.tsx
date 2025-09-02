@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaUpload, FaTimes, FaPlus } from "react-icons/fa";
+import { FaTimes, FaPlus } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import apiClient from "../../services/api.ts";
 
@@ -11,16 +11,14 @@ const AddProperty: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrl, setImageUrl] = useState("");
 
+  // Form state
   const [form, setForm] = useState({
     title: "",
     description: "",
     price: "",
     location: "",
-    latitude: "",
-    longitude: "",
     propertyType: "",
     bedrooms: "",
     bathrooms: "",
@@ -31,47 +29,24 @@ const AddProperty: React.FC = () => {
 
   const [newAmenity, setNewAmenity] = useState("");
 
+  // Dropdown options
   const propertyTypes = [
     "house", "apartment", "land", "villa", "condo", "townhouse", "studio", "penthouse"
   ];
 
   const availableAmenities = [
-    "Parking", "Garden", "Balcony", "Terrace", "Swimming Pool", "Gym", 
+    "Parking", "Garden", "Balcony", "Terrace", "Swimming Pool", "Gym",
     "Security", "Lift", "Power Backup", "Water Supply", "Internet", "Furnished"
   ];
 
+  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (error) setError("");
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(file => file.type.startsWith('image/'));
-    
-    if (validFiles.length + images.length > 5) {
-      setError("Maximum 5 images allowed");
-      return;
-    }
-
-    setImages(prev => [...prev, ...validFiles]);
-    
-    // Create preview URLs
-    validFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageUrls(prev => [...prev, e.target?.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setImageUrls(prev => prev.filter((_, i) => i !== index));
-  };
-
+  // Add new amenity
   const addAmenity = () => {
     if (newAmenity.trim() && !form.amenities.includes(newAmenity.trim())) {
       setForm(prev => ({
@@ -82,6 +57,7 @@ const AddProperty: React.FC = () => {
     }
   };
 
+  // Remove amenity
   const removeAmenity = (amenity: string) => {
     setForm(prev => ({
       ...prev,
@@ -89,6 +65,7 @@ const AddProperty: React.FC = () => {
     }));
   };
 
+  // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -96,23 +73,16 @@ const AddProperty: React.FC = () => {
     setSuccess("");
 
     try {
-      // Validate form
-      if (!form.title || !form.description || !form.price || !form.location || 
-          !form.propertyType || !form.bedrooms || !form.bathrooms || !form.area) {
+      // Basic validations
+      if (!form.title || !form.description || !form.price || !form.location ||
+        !form.propertyType || !form.bedrooms || !form.bathrooms || !form.area) {
         throw new Error("Please fill in all required fields");
       }
 
-      // Validate price
-      if (parseFloat(form.price) <= 0) {
-        throw new Error("Price must be greater than 0");
-      }
+      if (parseFloat(form.price) <= 0) throw new Error("Price must be greater than 0");
+      if (parseFloat(form.area) <= 0) throw new Error("Area must be greater than 0");
 
-      // Validate area
-      if (parseFloat(form.area) <= 0) {
-        throw new Error("Area must be greater than 0");
-      }
-
-      // Create FormData for multipart upload
+      // Create FormData for API
       const formData = new FormData();
       formData.append('title', form.title);
       formData.append('description', form.description);
@@ -123,31 +93,16 @@ const AddProperty: React.FC = () => {
       formData.append('bathrooms', form.bathrooms);
       formData.append('area', form.area);
       formData.append('status', form.status);
-      
-      // Add coordinates if provided
-      if (form.latitude && form.longitude) {
-        formData.append('coordinates[latitude]', form.latitude);
-        formData.append('coordinates[longitude]', form.longitude);
-      }
-      
-      // Add amenities as array
+
       form.amenities.forEach(amenity => {
         formData.append('amenities[]', amenity);
       });
 
-      // Add images if available
-      if (images.length > 0) {
-        // First image as main image
-        formData.append('image', images[0]);
-        
-        // Additional images
-        for (let i = 1; i < images.length; i++) {
-          formData.append('images', images[i]);
-        }
-      }
+      if (imageUrl) formData.append('image', imageUrl);
 
+      // API call
       const response = await apiClient.createProperty(formData);
-      
+
       if (response.success) {
         setSuccess("Property added successfully! Redirecting to dashboard...");
         setTimeout(() => {
@@ -162,6 +117,7 @@ const AddProperty: React.FC = () => {
     }
   };
 
+  // Block unauthorized access
   if (!user || user.role !== 'seller') {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -187,26 +143,28 @@ const AddProperty: React.FC = () => {
             <p className="text-gray-600">List your property to reach potential buyers</p>
           </div>
 
-          {/* Error/Success Messages */}
+          {/* Error/Success Alerts */}
           {error && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
               {error}
             </div>
           )}
-          
           {success && (
             <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
               {success}
             </div>
           )}
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic Information */}
+
+              {/* Basic Info */}
               <div className="md:col-span-2">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
               </div>
 
+              {/* Title */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Property Title *
@@ -222,6 +180,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
+              {/* Description */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description *
@@ -237,6 +196,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
+              {/* Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Price (₹) *
@@ -253,6 +213,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
+              {/* Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Location *
@@ -268,46 +229,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
-              {/* Coordinates Section */}
-              <div className="md:col-span-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-blue-800 mb-3">Location Coordinates (Optional)</h3>
-                  <p className="text-xs text-blue-600 mb-3">
-                    Add precise coordinates for better map integration. You can find coordinates using Google Maps or other mapping services.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-blue-700 mb-1">
-                        Latitude
-                      </label>
-                      <input
-                        type="number"
-                        name="latitude"
-                        step="any"
-                        value={form.latitude || ""}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                        placeholder="e.g., 19.0760"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-blue-700 mb-1">
-                        Longitude
-                      </label>
-                      <input
-                        type="number"
-                        name="longitude"
-                        step="any"
-                        value={form.longitude || ""}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                        placeholder="e.g., 72.8777"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+              {/* Property Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Property Type *
@@ -326,6 +248,7 @@ const AddProperty: React.FC = () => {
                 </select>
               </div>
 
+              {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Status
@@ -347,6 +270,7 @@ const AddProperty: React.FC = () => {
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Property Details</h2>
               </div>
 
+              {/* Bedrooms */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bedrooms *
@@ -363,6 +287,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
+              {/* Bathrooms */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bathrooms *
@@ -379,6 +304,7 @@ const AddProperty: React.FC = () => {
                 />
               </div>
 
+              {/* Area */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Area (sq ft) *
@@ -398,7 +324,8 @@ const AddProperty: React.FC = () => {
               {/* Amenities */}
               <div className="md:col-span-2">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Amenities</h2>
-                
+
+                {/* Custom Amenity */}
                 <div className="mb-4">
                   <div className="flex gap-2 mb-4">
                     <input
@@ -416,7 +343,8 @@ const AddProperty: React.FC = () => {
                       <FaPlus />
                     </button>
                   </div>
-                  
+
+                  {/* Predefined Amenities */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {availableAmenities.map(amenity => (
                       <label key={amenity} className="flex items-center">
@@ -444,6 +372,7 @@ const AddProperty: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Selected Amenities */}
                 {form.amenities.length > 0 && (
                   <div>
                     <h3 className="text-lg font-medium text-gray-800 mb-2">Selected Amenities</h3>
@@ -468,53 +397,34 @@ const AddProperty: React.FC = () => {
                 )}
               </div>
 
-              {/* Image Upload */}
+              {/* Image URL */}
               <div className="md:col-span-2">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Property Images</h2>
-                
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label htmlFor="image-upload" className="cursor-pointer">
-                    <FaUpload className="mx-auto text-4xl text-gray-400 mb-4" />
-                    <p className="text-gray-600">Click to upload images (Max 5)</p>
-                    <p className="text-sm text-gray-500">PNG, JPG, JPEG up to 5MB each</p>
-                  </label>
-                </div>
-
-                {imageUrls.length > 0 && (
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">Property Image</h2>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image URL *
+                </label>
+                <input
+                  type="url"
+                  name="imageUrl"
+                  value={imageUrl}
+                  onChange={e => setImageUrl(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter image URL (e.g. https://...)"
+                />
+                {imageUrl && (
                   <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-800 mb-2">Uploaded Images</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {imageUrls.map((url, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={url}
-                            alt={`Property ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <img
+                      src={imageUrl}
+                      alt="Property Preview"
+                      className="w-full h-40 object-cover rounded-lg border"
+                    />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit / Cancel */}
             <div className="mt-8 flex justify-end space-x-4">
               <button
                 type="button"
@@ -526,11 +436,10 @@ const AddProperty: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-6 py-3 rounded-lg font-medium ${
-                  loading
+                className={`px-6 py-3 rounded-lg font-medium ${loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
+                  }`}
               >
                 {loading ? "Adding Property..." : "Add Property"}
               </button>
@@ -542,4 +451,4 @@ const AddProperty: React.FC = () => {
   );
 };
 
-export default AddProperty; 
+export default AddProperty;

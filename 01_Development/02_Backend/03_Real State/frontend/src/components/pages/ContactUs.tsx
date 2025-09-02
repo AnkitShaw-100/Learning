@@ -11,6 +11,7 @@ interface ContactFormData {
 }
 
 const ContactUs: React.FC = () => {
+  // form state
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
@@ -21,6 +22,7 @@ const ContactUs: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
+  // form validation
   const validateForm = (): boolean => {
     const newErrors: Partial<ContactFormData> = {};
 
@@ -42,12 +44,11 @@ const ContactUs: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     setSubmitStatus("idle");
@@ -56,7 +57,7 @@ const ContactUs: React.FC = () => {
       const response = await apiClient.submitContact(formData);
       if (response.success) {
         setSubmitStatus("success");
-        setFormData({ name: "", email: "", phone: "", message: "" });
+        setFormData({ name: "", email: "", phone: "", message: "" }); // reset form
         setErrors({});
       } else {
         setSubmitStatus("error");
@@ -68,11 +69,12 @@ const ContactUs: React.FC = () => {
     }
   };
 
+  // handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user starts typing
+    // clear error when typing
     if (errors[name as keyof ContactFormData]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
@@ -158,6 +160,7 @@ const ContactUs: React.FC = () => {
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">Send Message</h2>
               
+              {/* success & error messages */}
               {submitStatus === "success" && (
                 <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
                   Thank you for your message! We'll get back to you soon.
@@ -170,7 +173,9 @@ const ContactUs: React.FC = () => {
                 </div>
               )}
 
+              {/* form */}
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* name field */}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name *
@@ -191,6 +196,7 @@ const ContactUs: React.FC = () => {
                   )}
                 </div>
 
+                {/* email field */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                     Email Address *
@@ -211,6 +217,7 @@ const ContactUs: React.FC = () => {
                   )}
                 </div>
 
+                {/* phone field */}
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
@@ -226,6 +233,7 @@ const ContactUs: React.FC = () => {
                   />
                 </div>
 
+                {/* message field */}
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
                     Message *
@@ -246,6 +254,7 @@ const ContactUs: React.FC = () => {
                   )}
                 </div>
 
+                {/* submit button */}
                 <button
                   type="submit"
                   disabled={isSubmitting}

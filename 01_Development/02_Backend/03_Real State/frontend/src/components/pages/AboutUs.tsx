@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import Ankit from "../../assets/team/Ankit.png";
-import Amiya from "../../assets/team/Amiya.jpg"
+import Amiya from "../../assets/team/Amiya.jpg";
 import { FaLinkedin, FaGithub } from "react-icons/fa";
 
 const AboutUs = () => {
+  // 👥 Team members data (name, role, image, socials)
   const teamMembers = [
     {
       name: "Ankit Shaw",
@@ -36,7 +37,7 @@ const AboutUs = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Header */}
+      {/* 🔹 Section Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-4">
           Meet Our <span className="text-blue-800">Team</span>
@@ -48,7 +49,7 @@ const AboutUs = () => {
         </p>
       </div>
 
-      {/* Team Grid */}
+      {/* 🔹 Team Member Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {teamMembers.map((member, idx) => (
           <motion.div
@@ -59,6 +60,7 @@ const AboutUs = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: idx * 0.15 }}
           >
+            {/* 👤 Profile Image with hover social icons */}
             <motion.div
               className="relative"
               whileHover={{ scale: 1.03 }}
@@ -69,6 +71,7 @@ const AboutUs = () => {
                 alt={member.name}
                 className="w-full h-64 object-cover"
               />
+              {/* Social icons overlay (visible on hover) */}
               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
                 <div className="flex space-x-4 text-white">
                   <a href={member.social.linkedin} aria-label="LinkedIn">
@@ -81,6 +84,7 @@ const AboutUs = () => {
               </div>
             </motion.div>
 
+            {/* 👤 Name + Role + Small icons */}
             <div className="p-6 text-center">
               <h3 className="text-xl font-semibold text-gray-900">{member.name}</h3>
               <p className="text-blue-900 font-medium">{member.role}</p>
@@ -97,7 +101,7 @@ const AboutUs = () => {
         ))}
       </div>
 
-      {/* Divider */}
+      {/* 🔹 Divider line with icon */}
       <div className="mt-20 mb-16">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -121,7 +125,7 @@ const AboutUs = () => {
         </div>
       </div>
 
-      {/* Mission Section */}
+      {/* 🔹 Mission Statement */}
       <div className="max-w-4xl mx-auto text-center px-4">
         <h3 className="text-2xl md:text-3xl font-bold text-blue-900 mb-4">
           Our Mission

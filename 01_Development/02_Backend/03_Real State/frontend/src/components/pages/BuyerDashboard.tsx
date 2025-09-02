@@ -1,286 +1,267 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaUser, FaHeart, FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes, FaHeart } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
-import apiClient from "../../services/api.ts";
+import apiClient from "../../services/api";
 
+// property type
 interface Property {
   _id: string;
   title: string;
-  description: string;
-  price: number;
   location: string;
-  propertyType: string;
-  bedrooms: number;
-  bathrooms: number;
-  area: number;
-  image: string;
-  images?: string[];
-  status: string;
-  listedBy?: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  createdAt?: string;
+  price: number;
+  description: string;
+  image?: string;
 }
 
-const BuyerDashboard: React.FC = () => {
-  const { user, checkAuth } = useAuth();
+// state type
+type State = {
+  favorites: Property[];
+  loading: boolean;
+  error: string;
+};
+
+// reducer
+function reducer(state: State, action: any): State {
+  switch (action.type) {
+    case "FETCH_START":
+      return { ...state, loading: true, error: "" };
+    case "FETCH_SUCCESS":
+      return { favorites: action.payload, loading: false, error: "" };
+    case "FETCH_ERROR":
+      return { ...state, loading: false, error: action.payload };
+    case "REMOVE_FAVORITE":
+      return {
+        ...state,
+        favorites: state.favorites.filter((p) => p._id !== action.payload),
+      };
+    default:
+      return state;
+  }
+}
+
+// Alert component
+const AlertBox = ({
+  type,
+  message,
+}: {
+  type: "success" | "error" | null;
+  message: string;
+}) => {
+  if (!type || !message) return null;
+
+  const baseStyle =
+    "p-3 mb-4 rounded text-center font-medium transition-all duration-300";
+  const styles: Record<"success" | "error" | null, string> = {
+    success: "bg-green-100 text-green-800 border border-green-300",
+    error: "bg-red-100 text-red-800 border border-red-300",
+    null: "",
+  };
+
+  return <div className={`${baseStyle} ${styles[type]}`}>{message}</div>;
+};
+
+const BuyerDashboard = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [favorites, setFavorites] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    name: user?.name || "",
-    phone: user?.phone || "",
+
+  const [state, dispatch] = useReducer(reducer, {
+    favorites: [],
+    loading: true,
+    error: "",
   });
 
-  useEffect(() => {
-    if (!user || user.role !== 'buyer') {
-      navigate('/login');
-      return;
-    }
-    fetchFavorites();
-  }, [user, navigate]);
+  const [editing, setEditing] = useState(false);
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
 
+  // alert state
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({
+    type: null,
+    message: "",
+  });
+
+  // show alert
+  const showAlert = (type: "success" | "error", message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert({ type: null, message: "" }), 3000);
+  };
+
+  // fetch favorites
   const fetchFavorites = async () => {
     try {
-      setLoading(true);
+      dispatch({ type: "FETCH_START" });
       const response = await apiClient.getFavorites();
       if (response.success && response.data) {
-        setFavorites(response.data);
+        dispatch({ type: "FETCH_SUCCESS", payload: response.data });
       } else {
-        setError("Failed to fetch favorites");
+        dispatch({ type: "FETCH_ERROR", payload: "Failed to load favorites" });
+        showAlert("error", "Failed to load favorites");
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch favorites";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+    } catch {
+      dispatch({ type: "FETCH_ERROR", payload: "Error loading favorites" });
+      showAlert("error", "Error loading favorites");
     }
   };
 
-  const handleProfileUpdate = async () => {
-    try {
-      const response = await apiClient.updateProfile(profileForm);
-      if (response.success) {
-        setEditingProfile(false);
-        await checkAuth(); // Refresh user data
-        setError("");
-      } else {
-        setError("Failed to update profile");
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
-      setError(errorMessage);
-    }
-  };
-
-  const handlePropertyClick = (propertyId: string) => {
-    navigate(`/properties/${propertyId}`);
-  };
-
-  const removeFavorite = async (propertyId: string) => {
+  // remove favorite
+  const handleRemoveFavorite = async (propertyId: string) => {
     try {
       const response = await apiClient.removeFromFavorites(propertyId);
       if (response.success) {
-        setFavorites(prev => prev.filter(prop => prop._id !== propertyId));
+        dispatch({ type: "REMOVE_FAVORITE", payload: propertyId });
+        showAlert("success", "Removed from favorites");
+      } else {
+        showAlert("error", "Failed to remove favorite");
       }
-    } catch (error) {
-      console.error("Error removing favorite:", error);
+    } catch {
+      showAlert("error", "Error removing favorite");
     }
   };
 
-  if (!user || user.role !== 'buyer') {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You need to be logged in as a buyer to access this page.</p>
-        </div>
-      </div>
-    );
-  }
+  // profile update
+  const handleProfileUpdate = async () => {
+    try {
+      setUpdatingProfile(true);
+      const response = await apiClient.updateUserProfile(profileForm);
+      if (response.success) {
+        showAlert("success", "Profile updated successfully");
+        setEditing(false);
+      } else {
+        showAlert("error", response.message || "Failed to update profile");
+      }
+    } catch {
+      showAlert("error", "Error updating profile");
+    } finally {
+      setUpdatingProfile(false);
+    }
+  };
+
+  // auth + fetch
+  useEffect(() => {
+    if (!user || user.role !== "buyer") {
+      navigate("/login");
+    } else {
+      fetchFavorites();
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Header */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">Buyer Dashboard</h1>
-                <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
-              </div>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <AlertBox type={alert.type} message={alert.message} />
+
+      {/* profile card */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-10">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-blue-900">My Profile</h2>
+          {editing ? (
+            <div className="flex gap-3">
               <button
-                onClick={() => navigate('/properties')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+                onClick={handleProfileUpdate}
+                disabled={updatingProfile}
+                className={`text-green-600 hover:text-green-700 ${
+                  updatingProfile ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Browse Properties
+                <FaSave />
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="text-red-600 hover:text-red-700"
+              >
+                <FaTimes />
               </button>
             </div>
+          ) : (
+            <button
+              onClick={() => setEditing(true)}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              <FaEdit />
+            </button>
+          )}
+        </div>
+
+        {editing ? (
+          <div className="mt-4 space-y-4">
+            <input
+              type="text"
+              value={profileForm.name}
+              onChange={(e) =>
+                setProfileForm({ ...profileForm, name: e.target.value })
+              }
+              className="w-full border rounded-lg px-3 py-2"
+            />
+            <input
+              type="email"
+              value={profileForm.email}
+              onChange={(e) =>
+                setProfileForm({ ...profileForm, email: e.target.value })
+              }
+              className="w-full border rounded-lg px-3 py-2"
+            />
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Section */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                    <FaUser className="mr-2" />
-                    Profile
-                  </h2>
-                  {!editingProfile ? (
-                    <button
-                      onClick={() => setEditingProfile(true)}
-                      className="text-blue-600 hover:text-blue-700"
-                    >
-                      <FaEdit />
-                    </button>
-                  ) : (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={handleProfileUpdate}
-                        className="text-green-600 hover:text-green-700"
-                      >
-                        <FaSave />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingProfile(false);
-                          setProfileForm({
-                            name: user?.name || "",
-                            phone: user?.phone || "",
-                          });
-                        }}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {editingProfile ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                      <input
-                        type="text"
-                        value={profileForm.name}
-                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                      <input
-                        type="text"
-                        value={profileForm.phone}
-                        onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-sm text-gray-500">Name:</span>
-                      <p className="font-medium">{user.name}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm text-gray-500">Email:</span>
-                      <p className="font-medium">{user.email}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm text-gray-500">Phone:</span>
-                      <p className="font-medium">{user.phone || "Not provided"}</p>
-                    </div>
-                  </div>
-                )}
-
-                {error && (
-                  <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Favorites Section */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                    <FaHeart className="mr-2" />
-                    My Favorites ({favorites.length})
-                  </h2>
-                  <button
-                    onClick={() => navigate('/favorites')}
-                    className="text-blue-600 hover:text-blue-700 text-sm"
-                  >
-                    View All
-                  </button>
-                </div>
-
-                {loading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading favorites...</p>
-                  </div>
-                ) : favorites.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600 mb-4">No favorites yet</p>
-                    <button
-                      onClick={() => navigate('/properties')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                    >
-                      Browse Properties
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {favorites.slice(0, 4).map((property) => (
-                      <div
-                        key={property._id}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() => handlePropertyClick(property._id)}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-gray-800 text-sm line-clamp-2">
-                            {property.title}
-                          </h3>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFavorite(property._id);
-                            }}
-                            className="text-red-500 hover:text-red-700 text-sm"
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                        <p className="text-gray-600 text-xs mb-2">{property.location}</p>
-                        <p className="text-blue-600 font-bold text-sm">
-                          ₹{property.price.toLocaleString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+        ) : (
+          <div className="mt-4 text-gray-700">
+            <p>Name: {user?.name}</p>
+            <p>Email: {user?.email}</p>
           </div>
-        </motion.div>
+        )}
       </div>
+
+      {/* favorites section */}
+      <h2 className="text-2xl font-bold text-blue-900 mb-6">My Favorites</h2>
+
+      {state.loading && <p className="text-gray-500">Loading favorites...</p>}
+      {state.error && (
+        <p className="text-red-500 mb-4">Error: {state.error}</p>
+      )}
+
+      {state.favorites.length === 0 && !state.loading ? (
+        <p className="text-gray-500">No favorites found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {state.favorites.map((property) => (
+            <motion.div
+              key={property._id}
+              className="bg-white rounded-lg shadow hover:shadow-lg transition p-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {property.image && (
+                <img
+                  src={property.image}
+                  alt={property.title}
+                  className="w-full h-32 object-cover rounded-md mb-2"
+                />
+              )}
+              <h3 className="text-lg font-semibold text-gray-900">
+                {property.title}
+              </h3>
+              <p className="text-gray-600">{property.location}</p>
+              <p className="text-blue-900 font-medium">${property.price}</p>
+              <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                {property.description}
+              </p>
+              <button
+                onClick={() => handleRemoveFavorite(property._id)}
+                className="mt-3 text-red-500 hover:text-red-600 flex items-center gap-1"
+              >
+                <FaHeart /> Remove
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

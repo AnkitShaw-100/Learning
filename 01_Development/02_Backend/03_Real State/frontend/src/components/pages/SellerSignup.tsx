@@ -74,7 +74,7 @@ const SellerSignup: React.FC = () => {
       };
 
       const response = await apiClient.register(userData);
-      
+
       if (response.success) {
         setSuccess("Account created successfully! Redirecting to login...");
         // Clear form
@@ -84,7 +84,7 @@ const SellerSignup: React.FC = () => {
           phone: "",
           password: "",
         });
-        
+
         // Redirect to login after 2 seconds
         setTimeout(() => {
           navigate("/login");
@@ -143,7 +143,7 @@ const SellerSignup: React.FC = () => {
               {error}
             </motion.div>
           )}
-          
+
           {success && (
             <motion.div
               className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg"
@@ -203,11 +203,10 @@ const SellerSignup: React.FC = () => {
             <motion.button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg font-medium transition ${
-                loading
+              className={`w-full py-3 rounded-lg font-medium transition ${loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-900 hover:bg-blue-800 text-white"
-              }`}
+                }`}
               variants={itemVariants}
               whileHover={!loading ? { scale: 1.03 } : {}}
               whileTap={!loading ? { scale: 0.97 } : {}}
