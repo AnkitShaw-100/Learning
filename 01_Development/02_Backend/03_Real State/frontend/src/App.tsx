@@ -4,7 +4,6 @@ import Navbar from './components/Navbar'
 import Home from './components/Home'
 import Benefits from './components/Benefits'
 import TestimonialsPage from './components/TestimonialsPage'
-import RecommendedResidences from './components/RecommendedResidences '
 import Footer from './components/Footer'
 import BuyerSignup from "./components/pages/BuyerSignup"
 import SellerSignup from './components/pages/SellerSignup'
@@ -24,7 +23,6 @@ const HomePage = () => {
     <>
       <Home />
       <Benefits />
-      <RecommendedResidences />
       <TestimonialsPage />
     </>
   )
@@ -33,7 +31,8 @@ const HomePage = () => {
 
 function App() {
   const location = useLocation()
-  const hideNavAndFooter = location.pathname === "/properties" || location.pathname.startsWith("/property/")
+  const hideNavAndFooter = location.pathname.startsWith("/property/")
+  const hideFooter = location.pathname === "/properties" || location.pathname.startsWith("/property/")
 
   return (
     <AuthProvider>
@@ -54,7 +53,7 @@ function App() {
         <Route path="/properties" element={<PropertyListing />} />
         <Route path="/favorites" element={<FavoritesPage />} />
       </Routes>
-      {!hideNavAndFooter && <Footer />}
+      {!hideFooter && <Footer />}
     </AuthProvider>
   )
 }

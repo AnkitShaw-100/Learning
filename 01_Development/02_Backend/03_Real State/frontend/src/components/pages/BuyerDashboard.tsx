@@ -52,7 +52,7 @@ const AlertBox = ({
   if (!type || !message) return null;
 
   const baseStyle =
-    "p-3 mb-4 rounded text-center font-medium transition-all duration-300";
+    "p-3 mb-4 rounded-lg text-center font-medium shadow-md animate-fade-in";
   const styles: Record<"success" | "error" | null, string> = {
     success: "bg-green-100 text-green-800 border border-green-300",
     error: "bg-red-100 text-red-800 border border-red-300",
@@ -160,23 +160,22 @@ const BuyerDashboard = () => {
       <AlertBox type={alert.type} message={alert.message} />
 
       {/* profile card */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-10">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-blue-900">My Profile</h2>
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
+        <div className="flex justify-between items-center border-b pb-3">
+          <h2 className="text-2xl font-bold text-blue-900">👤 My Profile</h2>
           {editing ? (
             <div className="flex gap-3">
               <button
                 onClick={handleProfileUpdate}
                 disabled={updatingProfile}
-                className={`text-green-600 hover:text-green-700 ${
-                  updatingProfile ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`p-2 rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition ${updatingProfile ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 <FaSave />
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="text-red-600 hover:text-red-700"
+                className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
               >
                 <FaTimes />
               </button>
@@ -184,7 +183,7 @@ const BuyerDashboard = () => {
           ) : (
             <button
               onClick={() => setEditing(true)}
-              className="text-blue-600 hover:text-blue-700"
+              className="p-2 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
             >
               <FaEdit />
             </button>
@@ -199,7 +198,7 @@ const BuyerDashboard = () => {
               onChange={(e) =>
                 setProfileForm({ ...profileForm, name: e.target.value })
               }
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
             />
             <input
               type="email"
@@ -207,13 +206,13 @@ const BuyerDashboard = () => {
               onChange={(e) =>
                 setProfileForm({ ...profileForm, email: e.target.value })
               }
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
             />
           </div>
         ) : (
-          <div className="mt-4 text-gray-700">
-            <p>Name: {user?.name}</p>
-            <p>Email: {user?.email}</p>
+          <div className="mt-4 text-gray-700 space-y-2">
+            <p><span className="font-medium text-gray-900">Name:</span> {user?.name}</p>
+            <p><span className="font-medium text-gray-900">Email:</span> {user?.email}</p>
           </div>
         )}
       </div>
@@ -229,11 +228,11 @@ const BuyerDashboard = () => {
       {state.favorites.length === 0 && !state.loading ? (
         <p className="text-gray-500">No favorites found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {state.favorites.map((property) => (
             <motion.div
               key={property._id}
-              className="bg-white rounded-lg shadow hover:shadow-lg transition p-4"
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -241,23 +240,25 @@ const BuyerDashboard = () => {
                 <img
                   src={property.image}
                   alt={property.title}
-                  className="w-full h-32 object-cover rounded-md mb-2"
+                  className="w-full h-40 object-cover rounded-t-xl"
                 />
               )}
-              <h3 className="text-lg font-semibold text-gray-900">
-                {property.title}
-              </h3>
-              <p className="text-gray-600">{property.location}</p>
-              <p className="text-blue-900 font-medium">${property.price}</p>
-              <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                {property.description}
-              </p>
-              <button
-                onClick={() => handleRemoveFavorite(property._id)}
-                className="mt-3 text-red-500 hover:text-red-600 flex items-center gap-1"
-              >
-                <FaHeart /> Remove
-              </button>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {property.title}
+                </h3>
+                <p className="text-gray-600">{property.location}</p>
+                <p className="text-blue-900 font-bold mt-1">₹{property.price.toLocaleString()}</p>
+                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                  {property.description}
+                </p>
+                <button
+                  onClick={() => handleRemoveFavorite(property._id)}
+                  className="mt-4 flex items-center gap-2 text-red-500 hover:text-red-600 font-medium transition"
+                >
+                  <FaHeart /> Remove
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>

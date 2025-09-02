@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import { FaGithub, FaFacebookF } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import image3 from "../../assets/exterior/image3.jpg";
 import { useAuth } from "../../context/AuthContext";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      when: "beforeChildren",
-      staggerChildren: 0.15,
-    },
+    transition: { when: "beforeChildren", staggerChildren: 0.15 },
   },
 };
 
@@ -27,16 +22,11 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Form state
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
     if (error) setError("");
   };
 
@@ -56,18 +46,16 @@ const Login: React.FC = () => {
       }
 
       const loggedInUser = await login(form.email, form.password);
-
       setSuccess("Login successful! Redirecting...");
-
       setForm({ email: "", password: "" });
 
       setTimeout(() => {
-        if (loggedInUser?.role === 'seller') {
-          navigate('/seller/dashboard');
-        } else if (loggedInUser?.role === 'buyer') {
-          navigate('/buyer/dashboard');
+        if (loggedInUser?.role === "seller") {
+          navigate("/seller/dashboard");
+        } else if (loggedInUser?.role === "buyer") {
+          navigate("/buyer/dashboard");
         } else {
-          navigate('/');
+          navigate("/");
         }
       }, 500);
     } catch (error: any) {
@@ -80,39 +68,39 @@ const Login: React.FC = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12"
+      className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white flex items-center justify-center px-4 py-12"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       <motion.div
-        className="max-w-5xl w-full bg-white shadow-xl rounded-3xl overflow-hidden flex flex-col md:flex-row transform -translate-y-[8%]"
+        className="max-w-5xl w-full bg-white shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row border border-gray-100"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         {/* Left - Form */}
         <motion.div
-          className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center"
+          className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white"
           variants={containerVariants}
         >
           <motion.h2
-            className="text-3xl font-bold text-gray-800 mb-4"
+            className="text-4xl font-extrabold text-gray-900 mb-3"
             variants={itemVariants}
           >
-            Welcome Back
+            Welcome Back 
           </motion.h2>
           <motion.p
-            className="text-sm text-gray-500 mb-6"
+            className="text-base text-gray-500 mb-8"
             variants={itemVariants}
           >
-            Sign in to your account to continue browsing properties.
+            Log in to your account and continue exploring the best properties.
           </motion.p>
 
           {/* Error/Success Messages */}
           {error && (
             <motion.div
-              className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg"
+              className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm"
               variants={itemVariants}
             >
               {error}
@@ -121,7 +109,7 @@ const Login: React.FC = () => {
 
           {success && (
             <motion.div
-              className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg"
+              className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm"
               variants={itemVariants}
             >
               {success}
@@ -130,7 +118,7 @@ const Login: React.FC = () => {
 
           <motion.form
             onSubmit={handleSubmit}
-            className="space-y-5"
+            className="space-y-6"
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
@@ -143,7 +131,7 @@ const Login: React.FC = () => {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-800 outline-none"
+                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-900 focus:border-blue-900 outline-none transition"
                 placeholder="Enter your email"
               />
             </motion.div>
@@ -158,7 +146,7 @@ const Login: React.FC = () => {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-800 outline-none"
+                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-900 focus:border-blue-900 outline-none transition"
                 placeholder="Enter your password"
               />
             </motion.div>
@@ -166,66 +154,56 @@ const Login: React.FC = () => {
             <motion.button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg font-medium transition ${loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-900 hover:bg-blue-800 text-white"
-                }`}
+              className={`w-full py-3 rounded-xl font-semibold shadow-md transition-all duration-200 ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed text-white"
+                  : "bg-blue-900 hover:bg-blue-800 text-white"
+              }`}
               whileHover={!loading ? { scale: 1.02 } : {}}
               whileTap={!loading ? { scale: 0.98 } : {}}
               variants={itemVariants}
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? "Logging In..." : "Log In"}
             </motion.button>
           </motion.form>
 
-          {/* OR divider */}
+          {/* Divider */}
           <motion.div className="flex items-center my-6" variants={itemVariants}>
             <div className="flex-grow h-px bg-gray-300"></div>
             <span className="px-4 text-sm text-gray-400">OR</span>
             <div className="flex-grow h-px bg-gray-300"></div>
           </motion.div>
 
-          {/* Social Login */}
-          <motion.div className="flex justify-center space-x-4" variants={itemVariants}>
-            <button
-              className="p-3 border border-gray-300 rounded-full bg-white shadow-sm transition hover:scale-105 focus:ring-2 focus:ring-gray-400"
-              aria-label="Sign in with GitHub"
+          {/* Links */}
+          <motion.p
+            className="text-sm text-center mt-4 text-gray-600"
+            variants={itemVariants}
+          >
+            Don’t have an account?{" "}
+            <Link
+              to="/signup/buyer"
+              className="text-blue-900 font-semibold hover:underline"
             >
-              <FaGithub className="text-gray-700 text-xl" />
-            </button>
-            <button
-              className="p-3 border border-gray-300 rounded-full bg-white shadow-sm transition hover:scale-105 focus:ring-2 focus:ring-blue-300"
-              aria-label="Sign in with Facebook"
-            >
-              <FaFacebookF className="text-blue-600 text-xl" />
-            </button>
-          </motion.div>
-
-          <motion.p className="text-sm text-center mt-6 text-gray-500" variants={itemVariants}>
-            Don't have an account?{" "}
-            <Link to="/signup/buyer" className="text-blue-800 font-medium hover:underline">
               Sign up
             </Link>
           </motion.p>
-
-          {/* Forgot Password */}
-          <motion.p className="text-sm text-center mt-2 text-gray-500" variants={itemVariants}>
-            <a href="#" className="text-blue-800 font-medium hover:underline">
-              Forgot your password?
-            </a>
+          <motion.p
+            className="text-sm text-center mt-2 text-gray-600"
+            variants={itemVariants}
+          >
           </motion.p>
         </motion.div>
 
         {/* Right - Image */}
         <motion.div
-          className="w-full md:w-1/2 hidden md:block"
+          className="w-full md:w-1/2 hidden md:block bg-gray-50"
           initial={{ x: 80, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <img
-            src={image3}
-            alt="Property Showcase"
+            src="https://imgs.search.brave.com/TsZQpJzmC_hNbFj0ZfrgiDmREbo1bkMhbmfnpTktE2o/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE2/MDI5NDE1MjU0MjEt/OGY4YjgxZDNlZGJi/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE9IeDhjSEp2/Y0dWeWRIbDhaVzU4/TUh4OE1IeDhmREE9"
+            alt="Property in India"
             className="h-full w-full object-cover"
           />
         </motion.div>
@@ -234,4 +212,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

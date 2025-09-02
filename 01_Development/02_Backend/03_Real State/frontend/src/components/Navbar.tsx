@@ -101,7 +101,7 @@ const Navbar = () => {
                                                 <p className="text-xs text-gray-500">{user.email}</p>
                                                 <p className="text-xs text-blue-600 font-medium capitalize">{user.role}</p>
                                             </div>
-                                            
+
                                             <Link
                                                 to={user.role === 'seller' ? "/seller/dashboard" : "/buyer/dashboard"}
                                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
@@ -110,7 +110,7 @@ const Navbar = () => {
                                                 <HiCog className="w-4 h-4 mr-3 text-gray-500" />
                                                 Dashboard
                                             </Link>
-                                            
+
                                             <Link
                                                 to="/favorites"
                                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
@@ -119,9 +119,9 @@ const Navbar = () => {
                                                 <HiHeart className="w-4 h-4 mr-3 text-gray-500" />
                                                 Favorites
                                             </Link>
-                                            
+
                                             <div className="border-t border-gray-100 my-1"></div>
-                                            
+
                                             <button
                                                 onClick={handleLogout}
                                                 className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"

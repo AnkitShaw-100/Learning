@@ -105,7 +105,7 @@ const AddProperty: React.FC = () => {
           };
           const next = [withCreatedAt, ...existing].slice(0, 50);
           localStorage.setItem('local_new_properties', JSON.stringify(next));
-        } catch {}
+        } catch { }
 
         setSuccess("Property created successfully!");
         setTimeout(() => {
@@ -441,8 +441,8 @@ const AddProperty: React.FC = () => {
                 type="submit"
                 disabled={loading}
                 className={`px-6 py-3 rounded-lg font-medium ${loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}
               >
                 {loading ? "Adding Property..." : "Add Property"}

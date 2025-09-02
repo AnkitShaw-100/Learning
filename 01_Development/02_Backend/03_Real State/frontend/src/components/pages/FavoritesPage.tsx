@@ -177,9 +177,8 @@ const FavoritesPage: React.FC = () => {
                     />
                     {/* status badge */}
                     <div className="absolute top-4 right-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
                         {property.status}
                       </span>
                     </div>
@@ -192,21 +191,21 @@ const FavoritesPage: React.FC = () => {
                       <FaTrash className="text-sm" />
                     </button>
                   </div>
-                  
+
                   {/* property details */}
                   <div className="p-6">
-                    <h3 
+                    <h3
                       className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer hover:text-blue-600 transition"
                       onClick={() => handlePropertyClick(property._id)}
                     >
                       {property.title}
                     </h3>
-                    
+
                     <div className="flex items-center text-gray-600 mb-3">
                       <FaMapMarkerAlt className="mr-1" />
                       <span className="text-sm">{property.location}</span>
                     </div>
-                    
+
                     {/* property specs */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -224,14 +223,14 @@ const FavoritesPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* price + CTA */}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-2xl font-bold text-blue-600">₹{property.price.toLocaleString()}</p>
                         <p className="text-sm text-gray-500">{property.propertyType}</p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handlePropertyClick(property._id)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
                       >

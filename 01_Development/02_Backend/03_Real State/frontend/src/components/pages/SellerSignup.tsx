@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import image3 from "../../assets/exterior/image7.jpg";
 import apiClient from "../../services/api.ts";
 
 const containerVariants = {
@@ -35,8 +34,7 @@ const SellerSignup: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (error) setError("");
+    if (error) setError(""); // clear error while typing
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,21 +44,15 @@ const SellerSignup: React.FC = () => {
     setSuccess("");
 
     try {
-      // Validate form
       if (!form.name || !form.email || !form.phone || !form.password) {
         throw new Error("All fields are required");
       }
-
       if (form.password.length < 6) {
         throw new Error("Password must be at least 6 characters long");
       }
-
-      // Phone number validation (10 digits)
       if (!/^[0-9]{10}$/.test(form.phone)) {
         throw new Error("Please enter a valid 10-digit phone number");
       }
-
-      // Email validation
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
         throw new Error("Please enter a valid email address");
       }
@@ -70,29 +62,23 @@ const SellerSignup: React.FC = () => {
         email: form.email,
         phone: form.phone,
         password: form.password,
-        role: "seller"
+        role: "seller",
       };
 
       const response = await apiClient.register(userData);
 
       if (response.success) {
-        setSuccess("Account created successfully! Redirecting to login...");
-        // Clear form
-        setForm({
-          name: "",
-          email: "",
-          phone: "",
-          password: "",
-        });
+        setSuccess("✅ Account created successfully! Redirecting to login...");
+        setForm({ name: "", email: "", phone: "", password: "" });
 
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
       console.error("Signup error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create account. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create account. Please try again.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -105,13 +91,13 @@ const SellerSignup: React.FC = () => {
 
   return (
     <motion.div
-      className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12"
+      className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center px-4 py-12"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       <motion.div
-        className="max-w-5xl w-full bg-white shadow-xl rounded-3xl overflow-hidden flex flex-col md:flex-row transform -translate-y-[8%]"
+        className="max-w-5xl w-full bg-white shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row transform -translate-y-[6%]"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -122,31 +108,31 @@ const SellerSignup: React.FC = () => {
           variants={containerVariants}
         >
           <motion.h2
-            className="text-3xl font-bold text-gray-800 mb-4"
+            className="text-3xl font-bold text-gray-900 mb-3"
             variants={itemVariants}
           >
-            Create Seller Account
+            Register as a Seller
           </motion.h2>
           <motion.p
-            className="text-sm text-gray-500 mb-6"
+            className="text-sm text-gray-500 mb-6 leading-relaxed"
             variants={itemVariants}
           >
-            Sign up as seller to list your properties and reach potential buyers.
+            Create your seller account to list properties and connect with
+            genuine buyers across India.
           </motion.p>
 
-          {/* Error/Success Messages */}
+          {/* Error / Success */}
           {error && (
             <motion.div
-              className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg"
+              className="mb-4 p-3 bg-red-50 border border-red-400 text-red-700 rounded-lg text-sm"
               variants={itemVariants}
             >
               {error}
             </motion.div>
           )}
-
           {success && (
             <motion.div
-              className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg"
+              className="mb-4 p-3 bg-green-50 border border-green-400 text-green-700 rounded-lg text-sm"
               variants={itemVariants}
             >
               {success}
@@ -163,25 +149,25 @@ const SellerSignup: React.FC = () => {
                 label: "Full Name",
                 name: "name",
                 type: "text",
-                placeholder: "Ankit Shaw",
+                placeholder: "Enter your full name",
               },
               {
-                label: "Email",
+                label: "Email Address",
                 name: "email",
                 type: "email",
-                placeholder: "example@domain.com",
+                placeholder: "Enter your email address",
               },
               {
                 label: "Phone Number",
                 name: "phone",
                 type: "tel",
-                placeholder: "9876543210",
+                placeholder: "Enter Phone number",
               },
               {
                 label: "Password",
                 name: "password",
                 type: "password",
-                placeholder: "••••••••",
+                placeholder: "Create a strong password",
               },
             ].map((field, index) => (
               <motion.div key={index} variants={itemVariants}>
@@ -195,7 +181,7 @@ const SellerSignup: React.FC = () => {
                   onChange={handleChange}
                   required
                   placeholder={field.placeholder}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-900 outline-none transition"
                 />
               </motion.div>
             ))}
@@ -203,10 +189,11 @@ const SellerSignup: React.FC = () => {
             <motion.button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg font-medium transition ${loading
-                  ? "bg-gray-400 cursor-not-allowed"
+              className={`w-full py-3 rounded-lg font-semibold transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed text-white"
                   : "bg-blue-900 hover:bg-blue-800 text-white"
-                }`}
+              }`}
               variants={itemVariants}
               whileHover={!loading ? { scale: 1.03 } : {}}
               whileTap={!loading ? { scale: 0.97 } : {}}
@@ -215,9 +202,15 @@ const SellerSignup: React.FC = () => {
             </motion.button>
           </motion.form>
 
-          <motion.p className="text-sm text-center mt-6 text-gray-500" variants={itemVariants}>
-            Already have an account?{" "}
-            <a href="/login" className="text-blue-800 font-medium hover:underline">
+          <motion.p
+            className="text-sm text-center mt-6 text-gray-600"
+            variants={itemVariants}
+          >
+            Already registered?{" "}
+            <a
+              href="/login"
+              className="text-blue-800 font-semibold hover:underline"
+            >
               Log in
             </a>
           </motion.p>
@@ -225,12 +218,12 @@ const SellerSignup: React.FC = () => {
           {/* Buyer Redirect */}
           <motion.button
             onClick={goToBuyer}
-            className="mt-6 w-full border border-blue-900 text-blue-900 hover:bg-blue-50 py-2 rounded-lg font-semibold transition"
+            className="mt-6 w-full border border-blue-900 text-blue-900 hover:bg-blue-50 py-2.5 rounded-lg font-semibold transition"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             variants={itemVariants}
           >
-            Sign Up as Buyer
+            Register as Buyer
           </motion.button>
         </motion.div>
 
@@ -242,8 +235,8 @@ const SellerSignup: React.FC = () => {
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <img
-            src={image3}
-            alt="Property Showcase"
+            src="https://imgs.search.brave.com/TsZQpJzmC_hNbFj0ZfrgiDmREbo1bkMhbmfnpTktE2o/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE2/MDI5NDE1MjU0MjEt/OGY4YjgxZDNlZGJi/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE9IeDhjSEp2/Y0dWeWRIbDhaVzU4/TUh4OE1IeDhmREE9"
+            alt="Indian Property"
             className="h-full w-full object-cover"
           />
         </motion.div>

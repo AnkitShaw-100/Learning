@@ -25,7 +25,7 @@ interface Property {
   images?: string[];
   status: string;
   listedBy?: PersonRef;
-  owner?: PersonRef; // backend may use owner instead of listedBy
+  owner?: PersonRef; 
   createdAt?: string;
 }
 
@@ -99,7 +99,7 @@ const PropertyListing: React.FC = () => {
           });
           setRecentSellerProperty(sorted[0]);
         }
-      } catch {}
+      } catch { }
     };
     fetchRecentForSeller();
   }, [user, allProperties]);
@@ -133,7 +133,7 @@ const PropertyListing: React.FC = () => {
             list = [...localList, ...rest];
           }
         }
-      } catch {}
+      } catch { }
 
       setAllProperties(list);
       setError("");
@@ -154,13 +154,13 @@ const PropertyListing: React.FC = () => {
                 sample = [...localList, ...rest];
               }
             }
-          } catch {}
+          } catch { }
           setAllProperties(sample);
           setError("");
           applyClientFiltersAndPaginate(sample);
           return;
         }
-      } catch {}
+      } catch { }
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch properties";
       setError(errorMessage);
       setAllProperties([]);
@@ -185,8 +185,8 @@ const PropertyListing: React.FC = () => {
       const keyword = (searchTerm || '').trim().toLowerCase();
       const matchesKeyword = !keyword ||
         (p.title?.toLowerCase().includes(keyword) ||
-         p.description?.toLowerCase().includes(keyword) ||
-         p.location?.toLowerCase().includes(keyword));
+          p.description?.toLowerCase().includes(keyword) ||
+          p.location?.toLowerCase().includes(keyword));
       return matchesType && matchesLoc && matchesBeds && matchesBaths && matchesMinPrice && matchesMaxPrice && matchesMinArea && matchesMaxArea && matchesKeyword;
     });
 
@@ -367,8 +367,8 @@ const PropertyListing: React.FC = () => {
                   <button
                     onClick={() => setViewMode("list")}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
-                        ? "bg-white text-blue-600 shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-800"
                       }`}
                   >
                     <FaList className="inline mr-1" />
@@ -377,36 +377,14 @@ const PropertyListing: React.FC = () => {
                   <button
                     onClick={() => setViewMode("map")}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "map"
-                        ? "bg-white text-blue-600 shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-800"
                       }`}
                   >
                     <FaMap className="inline mr-1" />
                     Map
                   </button>
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="createdAt">Date Listed</option>
-                  <option value="price">Price</option>
-                  <option value="area">Area</option>
-                  <option value="bedrooms">Bedrooms</option>
-                </select>
-
-                <select
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="desc">Descending</option>
-                  <option value="asc">Ascending</option>
-                </select>
               </div>
             </div>
 
