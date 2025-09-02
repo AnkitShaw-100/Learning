@@ -24,17 +24,19 @@ const itemVariants = {
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Form state
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    // Clear error when user starts typing
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
     if (error) setError("");
   };
 
@@ -45,30 +47,29 @@ const Login: React.FC = () => {
     setSuccess("");
 
     try {
-      // Validate form
       if (!form.email || !form.password) {
         throw new Error("Email and password are required");
       }
 
-      // Email validation
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
         throw new Error("Please enter a valid email address");
       }
 
-      await login(form.email, form.password);
+      const loggedInUser = await login(form.email, form.password);
 
       setSuccess("Login successful! Redirecting...");
 
-      // Clear form
-      setForm({
-        email: "",
-        password: "",
-      });
+      setForm({ email: "", password: "" });
 
-      // Redirect to home page after 1 second
       setTimeout(() => {
-        navigate("/");
-      }, 1000);
+        if (loggedInUser?.role === 'seller') {
+          navigate('/seller/dashboard');
+        } else if (loggedInUser?.role === 'buyer') {
+          navigate('/buyer/dashboard');
+        } else {
+          navigate('/');
+        }
+      }, 500);
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error.message || "Login failed. Please check your credentials.");

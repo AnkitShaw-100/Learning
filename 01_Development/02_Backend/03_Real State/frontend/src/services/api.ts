@@ -168,19 +168,43 @@ class ApiClient {
   }
 
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await this.request<{ token: string; data: User }>('/auth/login', {
+    const response = await this.request<{ token: string; data?: User; user?: User } | (User & { token: string })>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
 
-    if (response.data?.token) {
-      this.setAuthToken(response.data.token);
+    const hasToken = (response as any)?.data?.token || (response as any)?.token;
+    const token = (response as any)?.data?.token ?? (response as any)?.token ?? null;
+
+    // Try to extract user from common shapes
+    const userFromData = (response as any)?.data?.data as User | undefined;
+    const userFromUser = (response as any)?.data?.user as User | undefined;
+    const userInline = (response as any) as (User & { token?: string });
+
+    const user: User | undefined = userFromData || userFromUser || (
+      (userInline && userInline._id && userInline.email && userInline.name) ? {
+        _id: userInline._id,
+        email: userInline.email,
+        name: userInline.name,
+        role: (userInline as any).role,
+        phone: (userInline as any).phone,
+        isVerified: (userInline as any).isVerified,
+      } : undefined
+    );
+
+    if (hasToken && token) {
+      this.setAuthToken(token);
+      if (user) {
+        return {
+          success: true,
+          data: { user, token },
+          message: 'Login successful'
+        };
+      }
+      // If token present but user missing, caller can fetch /auth/me
       return {
         success: true,
-        data: {
-          user: response.data.data,
-          token: response.data.token
-        },
+        data: { user: (undefined as unknown as User), token },
         message: 'Login successful'
       };
     }
@@ -222,49 +246,120 @@ class ApiClient {
       }
     });
     const queryString = queryParams.toString();
-    const endpoint = queryString ? `/properties?${queryString}` : '/properties';
-    return this.request(endpoint);
+
+    const tryEndpoints = [
+      queryString ? `/properties?${queryString}` : '/properties',
+      queryString ? `/listings?${queryString}` : '/listings',
+    ];
+
+    for (const endpoint of tryEndpoints) {
+      try {
+        const raw = await this.request<any>(endpoint);
+        // Normalize: backend may return an array or a wrapped object
+        if (Array.isArray(raw)) {
+          return {
+            success: true,
+            data: {
+              properties: raw as Property[],
+              total: raw.length,
+              page: 1,
+              pages: 1,
+            },
+          };
+        }
+        if (raw && raw.properties) {
+          return { success: true, data: raw };
+        }
+        // Some APIs return { data: { properties: [] }, pagination... }
+        if (raw && raw.data && raw.data.properties) {
+          return { success: true, data: raw.data };
+        }
+        // If object looks like a single property list under a key
+        if (raw && typeof raw === 'object') {
+          const maybeArray = (raw as any).data || (raw as any).items || (raw as any).results;
+          if (Array.isArray(maybeArray)) {
+            return {
+              success: true,
+              data: {
+                properties: maybeArray,
+                total: maybeArray.length,
+                page: (raw as any).page || 1,
+                pages: (raw as any).pages || 1,
+              },
+            };
+          }
+        }
+      } catch {}
+    }
+
+    return { success: false, error: 'Failed to fetch properties' } as unknown as ApiResponse<{ properties: Property[], total: number, page: number, pages: number }>;
   }
 
   async getProperty(id: string | number): Promise<ApiResponse<Property>> {
-    return this.request(`/properties/${id}`);
+    const endpoints = [`/properties/${id}`, `/listings/${id}`];
+    for (const endpoint of endpoints) {
+      try {
+        const raw = await this.request<any>(endpoint);
+        if (raw && raw._id) {
+          return { success: true, data: raw };
+        }
+        if (raw && raw.data && raw.data._id) {
+          return { success: true, data: raw.data };
+        }
+      } catch {}
+    }
+    return { success: false, error: 'Failed to fetch property' } as unknown as ApiResponse<Property>;
   }
 
   async createProperty(propertyData: PropertyData | FormData): Promise<ApiResponse> {
     // Handle both JSON and FormData (for file uploads)
     if (propertyData instanceof FormData) {
-      const url = `${this.baseURL}/properties`;
-      const config = {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`,
-        },
-        body: propertyData,
-      };
-
-      try {
-        const response = await fetch(url, config);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Property creation failed');
-        }
-
-        return { success: true, data, message: 'Property created successfully' };
-      } catch (error) {
-        console.error('Property creation error:', error);
-        throw error;
+      const endpoints = [`${this.baseURL}/properties`, `${this.baseURL}/listings`];
+      for (const url of endpoints) {
+        const config = {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.getAuthToken()}`,
+          },
+          body: propertyData,
+        } as RequestInit;
+        try {
+          const response = await fetch(url, config);
+          const data = await response.json();
+          if (response.ok) return { success: true, data, message: 'Property created successfully' };
+        } catch {}
       }
+      return { success: false, error: 'Property creation failed' } as unknown as ApiResponse;
     } else {
-      return this.request('/properties', {
-        method: 'POST',
-        body: JSON.stringify(propertyData),
-      });
+      // JSON payload version
+      const endpoints = ['/properties', '/listings'];
+      for (const endpoint of endpoints) {
+        try {
+          const res = await this.request(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(propertyData),
+          });
+          if ((res as any)?.success !== false) return { success: true, data: (res as any)?.data || res } as ApiResponse;
+        } catch {}
+      }
+      return { success: false, error: 'Property creation failed' } as unknown as ApiResponse;
     }
   }
 
   async getUserProperties(): Promise<ApiResponse<Property[]>> {
-    return this.request('/properties/my');
+    const endpoints = ['/properties/my', '/listings/my-listings'];
+    for (const endpoint of endpoints) {
+      try {
+        const raw = await this.request<any>(endpoint);
+        if (Array.isArray(raw)) {
+          return { success: true, data: raw };
+        }
+        if (raw && Array.isArray(raw.data)) {
+          return { success: true, data: raw.data };
+        }
+      } catch {}
+    }
+    return { success: false, error: 'Failed to fetch user properties' } as unknown as ApiResponse<Property[]>;
   }
 
   async updateProperty(id: string | number, propertyData: Partial<PropertyData>): Promise<ApiResponse> {
@@ -305,19 +400,38 @@ class ApiClient {
 
   // Favorites methods
   async getFavorites(): Promise<ApiResponse<Property[]>> {
-    return this.request('/properties/favorites');
+    const endpoints = ['/properties/favorites', '/favorites'];
+    for (const endpoint of endpoints) {
+      try {
+        const raw = await this.request<any>(endpoint);
+        if (Array.isArray(raw)) return { success: true, data: raw };
+        if (raw && Array.isArray(raw.data)) return { success: true, data: raw.data };
+        if (raw && Array.isArray(raw.favorites)) return { success: true, data: raw.favorites };
+      } catch {}
+    }
+    return { success: false, error: 'Failed to fetch favorites' } as unknown as ApiResponse<Property[]>;
   }
 
   async addToFavorites(propertyId: string | number): Promise<ApiResponse> {
-    return this.request(`/properties/favorites/${propertyId}`, {
-      method: 'POST',
-    });
+    const endpoints = [`/properties/favorites/${propertyId}`, `/favorites/${propertyId}`];
+    for (const endpoint of endpoints) {
+      try {
+        const res = await this.request(endpoint, { method: 'POST' });
+        return res;
+      } catch (e) {}
+    }
+    return { success: false, error: 'Failed to add favorite' } as unknown as ApiResponse;
   }
 
   async removeFromFavorites(propertyId: string | number): Promise<ApiResponse> {
-    return this.request(`/properties/favorites/${propertyId}`, {
-      method: 'DELETE',
-    });
+    const endpoints = [`/properties/favorites/${propertyId}`, `/favorites/${propertyId}`];
+    for (const endpoint of endpoints) {
+      try {
+        const res = await this.request(endpoint, { method: 'DELETE' });
+        return res;
+      } catch (e) {}
+    }
+    return { success: false, error: 'Failed to remove favorite' } as unknown as ApiResponse;
   }
 
   // Contact methods

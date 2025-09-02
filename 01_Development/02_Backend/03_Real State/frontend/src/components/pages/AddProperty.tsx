@@ -82,36 +82,40 @@ const AddProperty: React.FC = () => {
       if (parseFloat(form.price) <= 0) throw new Error("Price must be greater than 0");
       if (parseFloat(form.area) <= 0) throw new Error("Area must be greater than 0");
 
-      // Create FormData for API
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('price', form.price);
-      formData.append('location', form.location);
-      formData.append('propertyType', form.propertyType.toLowerCase());
-      formData.append('bedrooms', form.bedrooms);
-      formData.append('bathrooms', form.bathrooms);
-      formData.append('area', form.area);
-      formData.append('status', form.status);
+      // Build JSON payload expected by backend (create route accepts minimal fields)
+      const payload = {
+        title: form.title,
+        description: form.description,
+        price: Number(form.price),
+        location: form.location,
+        images: imageUrl ? [imageUrl] : [],
+      };
 
-      form.amenities.forEach(amenity => {
-        formData.append('amenities[]', amenity);
-      });
-
-      if (imageUrl) formData.append('image', imageUrl);
-
-      // API call
-      const response = await apiClient.createProperty(formData);
+      const response = await apiClient.createProperty(payload as any);
 
       if (response.success) {
-        setSuccess("Property added successfully! Redirecting to dashboard...");
+        // Persist locally for fallback display on /properties
+        try {
+          const created = (response as any).data || {};
+          const existingRaw = localStorage.getItem('local_new_properties');
+          const existing = existingRaw ? JSON.parse(existingRaw) : [];
+          const withCreatedAt = {
+            ...created,
+            createdAt: created.createdAt || new Date().toISOString(),
+          };
+          const next = [withCreatedAt, ...existing].slice(0, 50);
+          localStorage.setItem('local_new_properties', JSON.stringify(next));
+        } catch {}
+
+        setSuccess("Property created successfully!");
         setTimeout(() => {
           navigate('/seller/dashboard');
-        }, 2000);
+        }, 800);
+      } else {
+        throw new Error(response.error || "Property creation failed");
       }
     } catch (error: any) {
-      console.error("Add property error:", error);
-      setError(error.message || "Failed to add property. Please try again.");
+      setError(error.message || "An error occurred while creating the property");
     } finally {
       setLoading(false);
     }

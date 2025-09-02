@@ -21,7 +21,7 @@ interface UserRegistrationData {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   register: (userData: UserRegistrationData) => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const response = await apiClient.login({ email, password });
     if (response.success && response.data) {
       setUser(response.data.user);
+      return response.data.user;
     } else {
       throw new Error(response.error || 'Login failed');
     }

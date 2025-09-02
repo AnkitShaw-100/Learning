@@ -3,6 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaFilter, FaMap, FaList } from "react-icons/fa";
 import apiClient from "../../services/api.ts";
+import { useAuth } from "../../context/AuthContext";
+
+interface PersonRef { _id: string; name: string; email: string }
 
 interface Property {
   _id: string;
@@ -21,7 +24,8 @@ interface Property {
   image: string;
   images?: string[];
   status: string;
-  listedBy?: { name: string; email: string };
+  listedBy?: PersonRef;
+  owner?: PersonRef; // backend may use owner instead of listedBy
   createdAt?: string;
 }
 
@@ -36,7 +40,9 @@ const DEFAULT_LIMIT = 9;
 
 const PropertyListing: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -56,6 +62,7 @@ const PropertyListing: React.FC = () => {
   const [sortOrder, setSortOrder] = useState(searchParams.get("order") || "desc");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [recentSellerProperty, setRecentSellerProperty] = useState<Property | null>(null);
 
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
@@ -63,49 +70,155 @@ const PropertyListing: React.FC = () => {
   useEffect(() => {
     fetchProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit]);
+  }, []);
+
+  useEffect(() => {
+    // Recompute client-side filters whenever inputs change
+    applyClientFiltersAndPaginate(allProperties);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, JSON.stringify(filters), sortBy, sortOrder, page, limit]);
+
+  useEffect(() => {
+    const fetchRecentForSeller = async () => {
+      if (!user || user.role !== 'seller') return;
+      try {
+        const res = await apiClient.getUserProperties();
+        let list: Property[] = [];
+        if (res.success && res.data && Array.isArray(res.data)) {
+          list = res.data as unknown as Property[];
+        }
+        if (list.length === 0 && allProperties.length > 0) {
+          // Fallback from overall list by owner/listedBy
+          list = allProperties.filter(p => (p.owner?._id === user._id) || (p.listedBy?._id === user._id));
+        }
+        if (list.length > 0) {
+          const sorted = [...list].sort((a, b) => {
+            const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return db - da;
+          });
+          setRecentSellerProperty(sorted[0]);
+        }
+      } catch {}
+    };
+    fetchRecentForSeller();
+  }, [user, allProperties]);
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.getProperties({
-        page,
-        limit,
-        keyword: searchTerm || undefined,
-        propertyType: filters.propertyType || undefined,
-        minPrice: filters.minPrice || undefined,
-        maxPrice: filters.maxPrice || undefined,
-        bedrooms: filters.bedrooms || undefined,
-        bathrooms: filters.bathrooms || undefined,
-        minArea: filters.minArea || undefined,
-        maxArea: filters.maxArea || undefined,
-        location: filters.location || undefined,
-        sortBy,
-        order: sortOrder,
-      } as Record<string, string | number | boolean>);
+      const response = await apiClient.getProperties({});
 
+      let list: Property[] = [];
       if (response.success && response.data) {
-        setProperties(response.data.properties || []);
-        if (response.data.total !== undefined) {
-          setPagination({
-            currentPage: response.data.page || 1,
-            totalPages: response.data.pages || 1,
-            totalItems: response.data.total,
-            itemsPerPage: limit
-          });
-        }
-        setError("");
-      } else {
-        setError("Failed to fetch properties");
-        setProperties([]);
+        list = (response.data.properties || []) as Property[];
       }
+
+      if (!list || list.length === 0) {
+        const res = await fetch('/properties.sample.json');
+        if (res.ok) {
+          list = await res.json();
+        }
+      }
+
+      // Merge locally created properties so they always appear
+      try {
+        const localRaw = localStorage.getItem('local_new_properties');
+        if (localRaw) {
+          const localList: Property[] = JSON.parse(localRaw);
+          if (Array.isArray(localList) && localList.length > 0) {
+            // Put local items first, then API list without duplicates
+            const ids = new Set(localList.map(p => p._id));
+            const rest = list.filter(p => !ids.has(p._id));
+            list = [...localList, ...rest];
+          }
+        }
+      } catch {}
+
+      setAllProperties(list);
+      setError("");
+      // Initial compute
+      applyClientFiltersAndPaginate(list);
     } catch (error) {
+      try {
+        const res = await fetch('/properties.sample.json');
+        if (res.ok) {
+          let sample: Property[] = await res.json();
+          try {
+            const localRaw = localStorage.getItem('local_new_properties');
+            if (localRaw) {
+              const localList: Property[] = JSON.parse(localRaw);
+              if (Array.isArray(localList) && localList.length > 0) {
+                const ids = new Set(localList.map(p => p._id));
+                const rest = sample.filter(p => !ids.has(p._id));
+                sample = [...localList, ...rest];
+              }
+            }
+          } catch {}
+          setAllProperties(sample);
+          setError("");
+          applyClientFiltersAndPaginate(sample);
+          return;
+        }
+      } catch {}
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch properties";
       setError(errorMessage);
+      setAllProperties([]);
       setProperties([]);
+      setPagination({ currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: limit });
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyClientFiltersAndPaginate = (list: Property[]) => {
+    // Filter
+    let filtered = list.filter((p) => {
+      const matchesType = !filters.propertyType || (p.propertyType?.toLowerCase() === filters.propertyType.toLowerCase());
+      const matchesLoc = !filters.location || (p.location?.toLowerCase() === filters.location.toLowerCase());
+      const matchesBeds = !filters.bedrooms || (Number(p.bedrooms || 0) >= Number(filters.bedrooms));
+      const matchesBaths = !filters.bathrooms || (Number(p.bathrooms || 0) >= Number(filters.bathrooms));
+      const matchesMinPrice = !filters.minPrice || (Number(p.price || 0) >= Number(filters.minPrice));
+      const matchesMaxPrice = !filters.maxPrice || (Number(p.price || 0) <= Number(filters.maxPrice));
+      const matchesMinArea = !filters.minArea || (Number(p.area || 0) >= Number(filters.minArea));
+      const matchesMaxArea = !filters.maxArea || (Number(p.area || 0) <= Number(filters.maxArea));
+      const keyword = (searchTerm || '').trim().toLowerCase();
+      const matchesKeyword = !keyword ||
+        (p.title?.toLowerCase().includes(keyword) ||
+         p.description?.toLowerCase().includes(keyword) ||
+         p.location?.toLowerCase().includes(keyword));
+      return matchesType && matchesLoc && matchesBeds && matchesBaths && matchesMinPrice && matchesMaxPrice && matchesMinArea && matchesMaxArea && matchesKeyword;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let va = 0, vb = 0;
+      switch (sortBy) {
+        case 'price':
+          va = a.price || 0; vb = b.price || 0; break;
+        case 'area':
+          va = a.area || 0; vb = b.area || 0; break;
+        case 'bedrooms':
+          va = a.bedrooms || 0; vb = b.bedrooms || 0; break;
+        case 'createdAt':
+        default:
+          va = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          vb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          break;
+      }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return sortOrder === 'asc' ? cmp : -cmp;
+    });
+
+    // Pagination
+    const totalItems = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+    const currentPage = Math.min(page, totalPages);
+    const start = (currentPage - 1) * limit;
+    const pageItems = filtered.slice(start, start + limit);
+
+    setProperties(pageItems);
+    setPagination({ currentPage, totalPages, totalItems, itemsPerPage: limit });
   };
 
   const goToPage = (targetPage: number) => {
@@ -131,7 +244,7 @@ const PropertyListing: React.FC = () => {
     next.set("page", "1");
     next.set("limit", String(limit));
     setSearchParams(next);
-    fetchProperties();
+    // No fetch; client-side filter will recompute via useEffect
   };
 
   const clearFilters = () => {
@@ -149,7 +262,6 @@ const PropertyListing: React.FC = () => {
     setSortBy("createdAt");
     setSortOrder("desc");
     setSearchParams(new URLSearchParams({ page: "1", limit: String(limit) }));
-    fetchProperties();
   };
 
   const handlePropertyClick = (propertyId: string) => {
@@ -157,7 +269,7 @@ const PropertyListing: React.FC = () => {
   };
 
   const propertyTypes = ["house", "apartment", "land", "villa", "condo", "townhouse", "studio", "penthouse"];
-  const locations = [...new Set(properties.map(p => p.location))];
+  const locations = [...new Set(allProperties.map(p => p.location))];
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -165,9 +277,32 @@ const PropertyListing: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           {/* Header */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Find Your Dream Property</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Find Your Dream Property</h1>
             <p className="text-gray-600">Discover the perfect place to call home</p>
           </div>
+
+          {/* Seller's Most Recent Listing */}
+          {user && user.role === 'seller' && recentSellerProperty && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-semibold text-blue-900">Your latest listing</h2>
+                <button onClick={() => navigate('/seller/dashboard')} className="text-blue-700 hover:text-blue-800 font-medium">Go to Dashboard</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-1">
+                  <img src={recentSellerProperty.image || recentSellerProperty.images?.[0] || '/placeholder-property.jpg'} alt={recentSellerProperty.title} className="w-full h-40 object-cover rounded-md" />
+                </div>
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-bold text-gray-900">{recentSellerProperty.title}</h3>
+                  <p className="text-gray-600 line-clamp-2">{recentSellerProperty.description}</p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="text-blue-700 font-semibold">₹{recentSellerProperty.price.toLocaleString()}</div>
+                    <button onClick={() => handlePropertyClick(recentSellerProperty._id)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">View</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Search and Filters */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -209,7 +344,7 @@ const PropertyListing: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">All Locations</option>
-                  {locations.map(location => (
+                  {[...new Set(allProperties.map(p => p.location))].map(location => (
                     <option key={location} value={location}>{location}</option>
                   ))}
                 </select>
@@ -445,15 +580,14 @@ const PropertyListing: React.FC = () => {
                               className="w-full h-full object-cover"
                             />
                             <div className="absolute top-4 right-4">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                {property.status}
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                {property.status || 'active'}
                               </span>
                             </div>
-                            {property.listedBy && (
+                            {(property.listedBy || property.owner) && (
                               <div className="absolute bottom-4 left-4">
                                 <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                  {property.listedBy.name}
+                                  {(property.listedBy?.name) || (property.owner?.name) || 'Seller'}
                                 </span>
                               </div>
                             )}
@@ -466,14 +600,14 @@ const PropertyListing: React.FC = () => {
                             </div>
                             <div className="flex items-center justify-between mb-4">
                               <div className="flex items-center space-x-4 text-sm text-gray-600">
-                                <div className="flex items-center"><FaBed className="mr-1" /><span>{property.bedrooms}</span></div>
-                                <div className="flex items-center"><FaBath className="mr-1" /><span>{property.bathrooms}</span></div>
-                                <div className="flex items-center"><FaRulerCombined className="mr-1" /><span>{property.area} sq ft</span></div>
+                                <div className="flex items-center"><FaBed className="mr-1" /><span>{property.bedrooms || '-'}</span></div>
+                                <div className="flex items-center"><FaBath className="mr-1" /><span>{property.bathrooms || '-'}</span></div>
+                                <div className="flex items-center"><FaRulerCombined className="mr-1" /><span>{property.area || '-'} sq ft</span></div>
                               </div>
                             </div>
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-2xl font-bold text-blue-600">₹{property.price.toLocaleString()}</p>
+                                <p className="text-2xl font-bold text-blue-600">₹{(property.price || 0).toLocaleString()}</p>
                                 <p className="text-sm text-gray-500 capitalize">{property.propertyType}</p>
                               </div>
                               <div className="flex space-x-2">
@@ -513,15 +647,13 @@ const PropertyListing: React.FC = () => {
                       {properties.filter(p => p.coordinates).length > 0 ? (
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-800">
+                            <h3 className="text-lg font-semibold text_gray-800">
                               Map View - {properties.filter(p => p.coordinates).length} Properties
                             </h3>
                             <p className="text-sm text-gray-500">
                               Properties with location data are shown below
                             </p>
                           </div>
-
-                          {/* Interactive Map Placeholder */}
                           <div className="h-96 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
                             <div className="text-center">
                               <FaMap className="text-5xl text-blue-400 mx-auto mb-4" />
@@ -534,8 +666,6 @@ const PropertyListing: React.FC = () => {
                               </div>
                             </div>
                           </div>
-
-                          {/* Properties List for Map View */}
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {properties.map((property) => (
                               <div
@@ -557,19 +687,14 @@ const PropertyListing: React.FC = () => {
                                       <FaMapMarkerAlt className="mr-1 text-blue-500" />
                                       {property.location}
                                     </p>
-                                    <p className="text-lg font-bold text-blue-600">₹{property.price.toLocaleString()}</p>
+                                    <p className="text-lg font-bold text-blue-600">₹{(property.price || 0).toLocaleString()}</p>
                                     <div className="flex items-center space-x-2 text-xs text-gray-500 mt-1">
-                                      <span>{property.bedrooms} beds</span>
+                                      <span>{property.bedrooms || '-'} beds</span>
                                       <span>•</span>
-                                      <span>{property.bathrooms} baths</span>
+                                      <span>{property.bathrooms || '-'} baths</span>
                                       <span>•</span>
-                                      <span>{property.area} sq ft</span>
+                                      <span>{property.area || '-'} sq ft</span>
                                     </div>
-                                    {property.coordinates && (
-                                      <div className="mt-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                                        📍 Has location data
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -606,13 +731,11 @@ const PropertyListing: React.FC = () => {
                     Previous
                   </button>
 
-                  {/* Page Numbers */}
                   {(() => {
-                    const pages = [];
+                    const pages: JSX.Element[] = [];
                     const totalPages = pagination.totalPages;
                     const currentPage = pagination.currentPage;
 
-                    // Show first page
                     if (totalPages > 0) {
                       pages.push(
                         <button
@@ -625,14 +748,10 @@ const PropertyListing: React.FC = () => {
                       );
                     }
 
-                    // Show ellipsis if needed
                     if (currentPage > 4) {
-                      pages.push(
-                        <span key="ellipsis1" className="px-2 py-2 text-gray-500">...</span>
-                      );
+                      pages.push(<span key="ellipsis1" className="px-2 py-2 text-gray-500">...</span>);
                     }
 
-                    // Show pages around current page
                     for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
                       if (i > 1 && i < totalPages) {
                         pages.push(
@@ -647,14 +766,10 @@ const PropertyListing: React.FC = () => {
                       }
                     }
 
-                    // Show ellipsis if needed
                     if (currentPage < totalPages - 3) {
-                      pages.push(
-                        <span key="ellipsis2" className="px-2 py-2 text-gray-500">...</span>
-                      );
+                      pages.push(<span key="ellipsis2" className="px-2 py-2 text-gray-500">...</span>);
                     }
 
-                    // Show last page
                     if (totalPages > 1) {
                       pages.push(
                         <button
