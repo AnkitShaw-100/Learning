@@ -148,54 +148,34 @@ const PropertyListing: React.FC = () => {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.getProperties({});
-
-      let list: Property[] = [];
+      // 1) Get latest 4 active seller listings from API
+      let latestSeller: Property[] = [];
+      const response = await apiClient.getProperties({ status: 'active', limit: 4 });
       if (response.success && response.data) {
-        list = (response.data.properties || []) as Property[];
+        latestSeller = (response.data.properties || []) as Property[];
       }
 
-      if (!list || list.length === 0) {
+      // 2) Load dummy properties from local sample and take 8–9
+      let dummyList: Property[] = [];
+      try {
         const res = await fetch('/properties.sample.json');
         if (res.ok) {
-          list = await res.json();
+          const allDummy: Property[] = await res.json();
+          dummyList = allDummy.slice(0, 9); // keep 8-9 dummy items
         }
-      }
+      } catch {}
 
-      // Merge locally created properties so they always appear
-      try {
-        const localRaw = localStorage.getItem('local_new_properties');
-        if (localRaw) {
-          const localList: Property[] = JSON.parse(localRaw);
-          if (Array.isArray(localList) && localList.length > 0) {
-            // Put local items first, then API list without duplicates
-            const ids = new Set(localList.map(p => p._id));
-            const rest = list.filter(p => !ids.has(p._id));
-            list = [...localList, ...rest];
-          }
-        }
-      } catch { }
+      const combined = [...latestSeller, ...dummyList];
 
-      setAllProperties(list);
+      setAllProperties(combined);
       setError("");
       // Initial compute
-      applyClientFiltersAndPaginate(list);
+      applyClientFiltersAndPaginate(combined);
     } catch (error) {
       try {
         const res = await fetch('/properties.sample.json');
         if (res.ok) {
-          let sample: Property[] = await res.json();
-          try {
-            const localRaw = localStorage.getItem('local_new_properties');
-            if (localRaw) {
-              const localList: Property[] = JSON.parse(localRaw);
-              if (Array.isArray(localList) && localList.length > 0) {
-                const ids = new Set(localList.map(p => p._id));
-                const rest = sample.filter(p => !ids.has(p._id));
-                sample = [...localList, ...rest];
-              }
-            }
-          } catch { }
+          const sample: Property[] = (await res.json()).slice(0, 9);
           setAllProperties(sample);
           setError("");
           applyClientFiltersAndPaginate(sample);

@@ -288,6 +288,19 @@ class ApiClient {
             },
           };
         }
+        // Handle backend that returns { listings, total, page, pages }
+        if (raw && Array.isArray((raw as any).listings)) {
+          const listings = (raw as any).listings as Property[];
+          return {
+            success: true,
+            data: {
+              properties: listings,
+              total: (raw as any).total ?? listings.length,
+              page: (raw as any).page ?? 1,
+              pages: (raw as any).pages ?? 1,
+            },
+          };
+        }
         if (raw && raw.properties) {
           return { success: true, data: raw };
         }
