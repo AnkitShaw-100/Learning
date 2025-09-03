@@ -15,6 +15,7 @@ import AddProperty from './components/pages/AddProperty'
 import SellerDashboard from './components/pages/SellerDashboard'
 import BuyerDashboard from './components/pages/BuyerDashboard'
 import FavoritesPage from './components/pages/FavoritesPage'
+import PropertyDetail from './components/pages/PropertyDetail'
 
 import './App.css'
 
@@ -41,6 +42,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/properties" element={<PropertyListing />} />
+        <Route path="/property/:propertyId" element={<PropertyDetail />} />
         <Route path="/services" element={<Benefits />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/about" element={<AboutUs />} />

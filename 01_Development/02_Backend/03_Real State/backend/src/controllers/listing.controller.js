@@ -1,12 +1,15 @@
+import Listing from "../models/Listing.js";
+
 export const getUserListings = async (req, res) => {
   try {
-    const listings = await Listing.find({ owner: req.user.id }).sort({ createdAt: -1 });
+    const listings = await Listing.find({ owner: req.user.id })
+      .populate("owner", "name email")
+      .sort({ createdAt: -1 });
     res.json(listings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-import Listing from "../models/Listing.js";
 
 // @desc Create listing (seller/admin)
 export const createListing = async (req, res) => {
@@ -16,9 +19,24 @@ export const createListing = async (req, res) => {
     if (req.files && req.files.length > 0) {
       images = req.files.map((file) => `/uploads/${file.filename}`);
     }
+    // Allow JSON bodies to set images or image URL when no files were uploaded
+    if ((!images || images.length === 0) && req.body) {
+      if (Array.isArray(req.body.images) && req.body.images.length > 0) {
+        images = req.body.images;
+      } else if (typeof req.body.image === 'string' && req.body.image.trim().length > 0) {
+        images = [req.body.image.trim()];
+      }
+    }
+
+    // Coerce numeric fields
+    const body = { ...req.body };
+    if (body.bedrooms !== undefined) body.bedrooms = Number(body.bedrooms);
+    if (body.bathrooms !== undefined) body.bathrooms = Number(body.bathrooms);
+    if (body.area !== undefined) body.area = Number(body.area);
+    if (body.price !== undefined) body.price = Number(body.price);
 
     const listing = await Listing.create({
-      ...req.body,
+      ...body,
       owner: req.user.id,
       images,
     });
@@ -71,7 +89,7 @@ export const deleteListing = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to delete this listing" });
     }
 
-    await listing.remove();
+    await listing.deleteOne();
     res.json({ message: "Listing removed" });
   } catch (err) {
     res.status(500).json({ message: err.message });

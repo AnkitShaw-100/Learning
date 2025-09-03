@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaFilter, FaMap, FaList } from "react-icons/fa";
+import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaFilter, FaMap, FaList, FaHeart } from "react-icons/fa";
 import apiClient from "../../services/api.ts";
 import { useAuth } from "../../context/AuthContext";
 
@@ -63,12 +63,16 @@ const PropertyListing: React.FC = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [recentSellerProperty, setRecentSellerProperty] = useState<Property | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
 
   useEffect(() => {
     fetchProperties();
+    if (user) {
+      fetchFavorites();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -103,6 +107,43 @@ const PropertyListing: React.FC = () => {
     };
     fetchRecentForSeller();
   }, [user, allProperties]);
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await apiClient.getFavorites();
+      if (response.success && response.data) {
+        const favoriteIds = new Set(response.data.map((p: Property) => p._id));
+        setFavorites(favoriteIds);
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  };
+
+  const handleFavoriteToggle = async (propertyId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      if (favorites.has(propertyId)) {
+        await apiClient.removeFromFavorites(propertyId);
+        setFavorites(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(propertyId);
+          return newSet;
+        });
+      } else {
+        const full = properties.find(p => p._id === propertyId) || allProperties.find(p => p._id === propertyId);
+        await apiClient.addToFavorites(propertyId, full);
+        setFavorites(prev => new Set(prev).add(propertyId));
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
 
   const fetchProperties = async () => {
     try {
@@ -265,7 +306,7 @@ const PropertyListing: React.FC = () => {
   };
 
   const handlePropertyClick = (propertyId: string) => {
-    navigate(`/properties/${propertyId}`);
+    navigate(`/property/${propertyId}`);
   };
 
   const propertyTypes = ["house", "apartment", "land", "villa", "condo", "townhouse", "studio", "penthouse"];
@@ -553,11 +594,25 @@ const PropertyListing: React.FC = () => {
                         >
                           <div className="relative h-48">
                             <img
-                              src={property.image || property.images?.[0] || '/placeholder-property.jpg'}
+                              src={property.image || property.images?.[0] || 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image'}
                               alt={property.title}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image';
+                              }}
                             />
-                            <div className="absolute top-4 right-4">
+                            <div className="absolute top-4 right-4 flex space-x-2">
+                              <button
+                                onClick={(e) => handleFavoriteToggle(property._id, e)}
+                                className={`p-2 rounded-full transition ${
+                                  favorites.has(property._id)
+                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                                }`}
+                              >
+                                <FaHeart className={`text-sm ${favorites.has(property._id) ? 'text-white' : ''}`} />
+                              </button>
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                 {property.status || 'active'}
                               </span>

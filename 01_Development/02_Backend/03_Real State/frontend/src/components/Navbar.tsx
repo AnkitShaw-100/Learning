@@ -54,6 +54,11 @@ const Navbar = () => {
         { text: "Contact", path: "/contact" },
     ];
 
+    const userNavLinks = user ? [
+        { text: "Favorites", path: "/favorites", icon: <HiHeart className="w-4 h-4" /> },
+        { text: "Dashboard", path: user.role === 'seller' ? "/seller/dashboard" : "/buyer/dashboard", icon: <HiCog className="w-4 h-4" /> },
+    ] : [];
+
     return (
         <nav className="bg-white shadow-lg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,6 +82,18 @@ const Navbar = () => {
                                 <span
                                     className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 w-0 group-hover:w-3/4 h-0.5 bg-blue-800 transition-all duration-300 origin-center rounded-full"
                                 ></span>
+                            </Link>
+                        ))}
+                        
+                        {/* User-specific navigation links */}
+                        {userNavLinks.map((link) => (
+                            <Link
+                                key={link.text}
+                                to={link.path}
+                                className="flex items-center gap-2 text-slate-800 font-medium text-base cursor-pointer transition-colors duration-200 hover:text-blue-800"
+                            >
+                                {link.icon}
+                                {link.text}
                             </Link>
                         ))}
                     </div>

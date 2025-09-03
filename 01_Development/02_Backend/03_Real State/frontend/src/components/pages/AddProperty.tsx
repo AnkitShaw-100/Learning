@@ -82,14 +82,20 @@ const AddProperty: React.FC = () => {
       if (parseFloat(form.price) <= 0) throw new Error("Price must be greater than 0");
       if (parseFloat(form.area) <= 0) throw new Error("Area must be greater than 0");
 
-      // Build JSON payload expected by backend (create route accepts minimal fields)
+      // Build JSON payload for backend (ensure numeric fields are numbers)
       const payload = {
         title: form.title,
         description: form.description,
         price: Number(form.price),
         location: form.location,
+        propertyType: form.propertyType,
+        status: form.status,
+        bedrooms: Number(form.bedrooms),
+        bathrooms: Number(form.bathrooms),
+        area: Number(form.area),
+        amenities: form.amenities,
         images: imageUrl ? [imageUrl] : [],
-      };
+      } as any;
 
       const response = await apiClient.createProperty(payload as any);
 
@@ -422,9 +428,16 @@ const AddProperty: React.FC = () => {
                       src={imageUrl}
                       alt="Property Preview"
                       className="w-full h-40 object-cover rounded-lg border"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/400x300/cccccc/666666?text=Invalid+Image+URL';
+                      }}
                     />
                   </div>
                 )}
+                <p className="mt-2 text-sm text-gray-500">
+                  💡 Tip: Use a direct image URL from services like Imgur, Google Drive (public), or any image hosting service
+                </p>
               </div>
             </div>
 

@@ -10,15 +10,26 @@ const listingSchema = new mongoose.Schema(
     location: { type: String, required: true },
     propertyType: {
       type: String,
-      enum: ["apartment", "house", "land", "villa", "office"],
+      enum: [
+        "apartment",
+        "house",
+        "land",
+        "villa",
+        "office",
+        "condo",
+        "townhouse",
+        "studio",
+        "penthouse"
+      ],
       default: "house",
     },
-    status: { type: String, enum: ["available", "sold"], default: "available" },
+    status: { type: String, enum: ["active", "inactive", "pending", "sold", "rented", "available"], default: "active" },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+    area: { type: Number, default: 0 },
     images: [{ type: String }],
   },
   { timestamps: true }

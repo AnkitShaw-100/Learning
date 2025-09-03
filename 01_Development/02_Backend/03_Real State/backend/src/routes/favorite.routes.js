@@ -8,14 +8,14 @@ import {
 
 const router = express.Router();
 
-// Only buyers & admins can manage favorites
-router.post("/:listingId", protect, authorize("buyer", "admin"), addFavorite);
+// Buyers, sellers & admins can manage favorites
+router.post("/:listingId", protect, authorize("buyer", "seller", "admin"), addFavorite);
 router.delete(
   "/:listingId",
   protect,
-  authorize("buyer", "admin"),
+  authorize("buyer", "seller", "admin"),
   removeFavorite
 );
-router.get("/", protect, authorize("buyer", "admin"), getFavorites);
+router.get("/", protect, authorize("buyer", "seller", "admin"), getFavorites);
 
 export default router;

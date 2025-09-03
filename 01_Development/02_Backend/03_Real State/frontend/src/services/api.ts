@@ -98,6 +98,27 @@ class ApiClient {
     this.baseURL = API_BASE_URL;
   }
 
+  // Helpers
+  private isValidObjectId(id: string | number): boolean {
+    const s = String(id);
+    return /^[0-9a-fA-F]{24}$/.test(s);
+  }
+
+  private readLocalFavorites(): any[] {
+    try {
+      const raw = localStorage.getItem('local_favorites');
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+
+  private writeLocalFavorites(items: any[]): void {
+    try {
+      localStorage.setItem('local_favorites', JSON.stringify(items.slice(0, 200)));
+    } catch {}
+  }
+
   // Helper method to get auth token
   getAuthToken(): string | null {
     return localStorage.getItem('token');
@@ -347,7 +368,8 @@ class ApiClient {
   }
 
   async getUserProperties(): Promise<ApiResponse<Property[]>> {
-    const endpoints = ['/properties/my', '/listings/my-listings'];
+    // Use listings endpoint first; '/properties/my' is not supported on this backend
+    const endpoints = ['/listings/my-listings'];
     for (const endpoint of endpoints) {
       try {
         const raw = await this.request<any>(endpoint);
@@ -363,6 +385,14 @@ class ApiClient {
   }
 
   async updateProperty(id: string | number, propertyData: Partial<PropertyData>): Promise<ApiResponse> {
+    // Prefer listings endpoint; fall back to properties
+    try {
+      const res = await this.request(`/listings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(propertyData),
+      });
+      return res;
+    } catch {}
     return this.request(`/properties/${id}`, {
       method: 'PUT',
       body: JSON.stringify(propertyData),
@@ -400,20 +430,43 @@ class ApiClient {
 
   // Favorites methods
   async getFavorites(): Promise<ApiResponse<Property[]>> {
-    const endpoints = ['/properties/favorites', '/favorites'];
+    // Merge server favorites with local favorites (non-ObjectId demo items)
+    let server: Property[] = [];
+    const endpoints = ['/favorites']; // primary backend route
     for (const endpoint of endpoints) {
       try {
         const raw = await this.request<any>(endpoint);
-        if (Array.isArray(raw)) return { success: true, data: raw };
-        if (raw && Array.isArray(raw.data)) return { success: true, data: raw.data };
-        if (raw && Array.isArray(raw.favorites)) return { success: true, data: raw.favorites };
+        if (Array.isArray(raw)) { server = raw as Property[]; break; }
+        if (raw && Array.isArray(raw.data)) { server = raw.data as Property[]; break; }
+        if (raw && Array.isArray(raw.favorites)) { server = raw.favorites as Property[]; break; }
       } catch {}
     }
-    return { success: false, error: 'Failed to fetch favorites' } as unknown as ApiResponse<Property[]>;
+
+    const local = this.readLocalFavorites();
+    // De-duplicate by _id preferring server entries
+    const map = new Map<string, Property>();
+    for (const item of local) {
+      if (item && item._id) map.set(String(item._id), item);
+    }
+    for (const item of server) {
+      if (item && item._id) map.set(String(item._id), item);
+    }
+    return { success: true, data: Array.from(map.values()) } as ApiResponse<Property[]>;
   }
 
-  async addToFavorites(propertyId: string | number): Promise<ApiResponse> {
-    const endpoints = [`/properties/favorites/${propertyId}`, `/favorites/${propertyId}`];
+  async addToFavorites(propertyId: string | number, fullProperty?: Partial<Property>): Promise<ApiResponse> {
+    // If not a valid ObjectId, store locally
+    if (!this.isValidObjectId(propertyId)) {
+      const items = this.readLocalFavorites();
+      const id = String(propertyId);
+      if (!items.some(p => String(p._id) === id)) {
+        const toStore = fullProperty && fullProperty._id ? fullProperty : { _id: id };
+        items.unshift(toStore);
+        this.writeLocalFavorites(items);
+      }
+      return { success: true, message: 'Favorited locally' } as ApiResponse;
+    }
+    const endpoints = [`/favorites/${propertyId}`];
     for (const endpoint of endpoints) {
       try {
         const res = await this.request(endpoint, { method: 'POST' });
@@ -424,7 +477,13 @@ class ApiClient {
   }
 
   async removeFromFavorites(propertyId: string | number): Promise<ApiResponse> {
-    const endpoints = [`/properties/favorites/${propertyId}`, `/favorites/${propertyId}`];
+    if (!this.isValidObjectId(propertyId)) {
+      const id = String(propertyId);
+      const items = this.readLocalFavorites().filter(p => String(p._id) !== id);
+      this.writeLocalFavorites(items);
+      return { success: true, message: 'Unfavorited locally' } as ApiResponse;
+    }
+    const endpoints = [`/favorites/${propertyId}`];
     for (const endpoint of endpoints) {
       try {
         const res = await this.request(endpoint, { method: 'DELETE' });

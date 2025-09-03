@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaPlus, FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import apiClient from "../../services/api.ts";
+import { FaPlus, FaEdit, FaTrash, FaEye, FaHeart, FaSearch, FaBed, FaBath, FaRulerCombined } from "react-icons/fa";
+import apiClient from "../../services/api";
 
 interface Property {
   _id: string;
@@ -26,6 +26,8 @@ const SellerDashboard: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [favorites, setFavorites] = useState<Property[]>([]);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'seller') {
@@ -33,7 +35,22 @@ const SellerDashboard: React.FC = () => {
       return;
     }
     fetchProperties();
+    fetchFavorites();
   }, [user, navigate]);
+
+  const fetchFavorites = async () => {
+    try {
+      setFavoritesLoading(true);
+      const response = await apiClient.getFavorites();
+      if (response.success && response.data) {
+        setFavorites(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    } finally {
+      setFavoritesLoading(false);
+    }
+  };
 
   const fetchProperties = async () => {
     try {
@@ -85,7 +102,7 @@ const SellerDashboard: React.FC = () => {
   };
 
   const handleViewProperty = (propertyId: string) => {
-    navigate(`/properties/${propertyId}`);
+    navigate(`/property/${propertyId}`);
   };
 
   if (!user || user.role !== 'seller') {
@@ -144,125 +161,195 @@ const SellerDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Properties List */}
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="px-6 py-4 border-b border-gray-200">
+          {/* Properties Grid */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-800">Your Properties</h2>
             </div>
 
             {loading ? (
-              <div className="p-8 text-center">
+              <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="mt-4 text-gray-600">Loading properties...</p>
               </div>
             ) : error ? (
-              <div className="p-8 text-center">
+              <div className="text-center py-12">
                 <p className="text-red-600">{error}</p>
               </div>
             ) : properties.length === 0 ? (
-              <div className="p-8 text-center">
+              <div className="text-center py-12">
                 <p className="text-gray-600">No properties found. Add your first property!</p>
+                <button
+                  onClick={handleAddProperty}
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+                >
+                  Add Your First Property
+                </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Property
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {properties.map((property) => (
-                      <tr key={property._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-12 w-12 flex-shrink-0">
-                              <img
-                                className="h-12 w-12 rounded-lg object-cover"
-                                src={property.images[0] || '/placeholder-property.jpg'}
-                                alt={property.title}
-                              />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {property.title}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {property.propertyType} • {property.bedrooms} bed • {property.bathrooms} bath
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            ₹{property.price.toLocaleString()}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{property.location}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select
-                            value={property.status}
-                            onChange={(e) => handleStatusChange(property._id, e.target.value)}
-                            className={`px-2 py-1 text-xs font-semibold rounded-full border-0 focus:ring-2 focus:ring-blue-500 ${property.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : property.status === 'sold'
-                                  ? 'bg-red-100 text-red-800'
-                                  : property.status === 'rented'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {properties.map((property) => (
+                  <motion.div
+                    key={property._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                  >
+                    <div className="relative h-48">
+                      <img
+                        src={property.images?.[0] || property.image || 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image'}
+                        alt={property.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image';
+                        }}
+                      />
+                      <div className="absolute top-3 right-3">
+                        <select
+                          value={property.status}
+                          onChange={(e) => handleStatusChange(property._id, e.target.value)}
+                          className={`px-2 py-1 text-xs font-semibold rounded-full border-0 focus:ring-2 focus:ring-blue-500 ${property.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : property.status === 'sold'
+                                ? 'bg-red-100 text-red-800'
+                                : property.status === 'rented'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                        >
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                          <option value="sold">Sold</option>
+                          <option value="rented">Rented</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                        {property.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {property.description}
+                      </p>
+                      
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-2xl font-bold text-blue-600">
+                          ₹{property.price.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-500 capitalize">
+                          {property.propertyType}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                        <div className="flex items-center">
+                          <FaBed className="mr-1 text-blue-500" />
+                          <span>{property.bedrooms || 0}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <FaBath className="mr-1 text-blue-500" />
+                          <span>{property.bathrooms || 0}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <FaRulerCombined className="mr-1 text-blue-500" />
+                          <span>{property.area || 0} sq ft</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                          {property.location}
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleViewProperty(property._id)}
+                            className="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50"
+                            title="View"
                           >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="sold">Sold</option>
-                            <option value="rented">Rented</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleViewProperty(property._id)}
-                              className="text-blue-600 hover:text-blue-900"
-                              title="View"
-                            >
-                              <FaEye />
-                            </button>
-                            <button
-                              onClick={() => handleEditProperty(property._id)}
-                              className="text-green-600 hover:text-green-900"
-                              title="Edit"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteProperty(property._id)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Delete"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                            <FaEye />
+                          </button>
+                          <button
+                            onClick={() => handleEditProperty(property._id)}
+                            className="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50"
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProperty(property._id)}
+                            className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Favorites Section */}
+          <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">❤️ My Favorites</h2>
+              <p className="text-gray-600 text-sm">Properties you've marked as favorites</p>
+            </div>
+
+            {favoritesLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-2 text-gray-500">Loading favorites...</p>
+              </div>
+            ) : favorites.length === 0 ? (
+              <div className="text-center py-8">
+                <FaHeart className="text-4xl text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No favorites yet. Start exploring properties!</p>
+                <button
+                  onClick={() => navigate('/properties')}
+                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
+                >
+                  Browse Properties
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {favorites.map((property) => (
+                  <div
+                    key={property._id}
+                    className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
+                        <img
+                          src={property.image || property.images?.[0] || 'https://via.placeholder.com/64x64/cccccc/666666?text=Property'}
+                          alt={property.title}
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/64x64/cccccc/666666?text=Property';
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 truncate">{property.title}</h4>
+                        <p className="text-sm text-gray-600 truncate">{property.location}</p>
+                        <p className="text-lg font-bold text-blue-600">₹{property.price.toLocaleString()}</p>
+                        <button
+                          onClick={() => navigate(`/property/${property._id}`)}
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

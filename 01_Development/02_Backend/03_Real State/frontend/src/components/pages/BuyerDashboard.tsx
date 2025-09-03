@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaEdit, FaSave, FaTimes, FaHeart } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes, FaHeart, FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRulerCombined, FaEye, FaTrash, FaEnvelope } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import apiClient from "../../services/api";
 
@@ -13,6 +13,12 @@ interface Property {
   price: number;
   description: string;
   image?: string;
+  images?: string[];
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  status?: string;
 }
 
 // state type
@@ -217,52 +223,172 @@ const BuyerDashboard = () => {
         )}
       </div>
 
-      {/* favorites section */}
-      <h2 className="text-2xl font-bold text-blue-900 mb-6">My Favorites</h2>
-
-      {state.loading && <p className="text-gray-500">Loading favorites...</p>}
-      {state.error && (
-        <p className="text-red-500 mb-4">Error: {state.error}</p>
-      )}
-
-      {state.favorites.length === 0 && !state.loading ? (
-        <p className="text-gray-500">No favorites found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {state.favorites.map((property) => (
-            <motion.div
-              key={property._id}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {property.image && (
-                <img
-                  src={property.image}
-                  alt={property.title}
-                  className="w-full h-40 object-cover rounded-t-xl"
-                />
-              )}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {property.title}
-                </h3>
-                <p className="text-gray-600">{property.location}</p>
-                <p className="text-blue-900 font-bold mt-1">₹{property.price.toLocaleString()}</p>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {property.description}
-                </p>
-                <button
-                  onClick={() => handleRemoveFavorite(property._id)}
-                  className="mt-4 flex items-center gap-2 text-red-500 hover:text-red-600 font-medium transition"
-                >
-                  <FaHeart /> Remove
-                </button>
-              </div>
-            </motion.div>
-          ))}
+      {/* Quick Actions */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
+        <h2 className="text-2xl font-bold text-blue-900 mb-6">🚀 Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button
+            onClick={() => navigate('/properties')}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl text-center transition-all duration-300 hover:shadow-lg"
+          >
+            <FaSearch className="text-3xl mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-2">Browse Properties</h3>
+            <p className="text-blue-100 text-sm">Explore available properties</p>
+          </button>
+          
+          <button
+            onClick={() => navigate('/favorites')}
+            className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-xl text-center transition-all duration-300 hover:shadow-lg"
+          >
+            <FaHeart className="text-3xl mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-2">View Favorites</h3>
+            <p className="text-red-100 text-sm">See your saved properties</p>
+          </button>
+          
+          <button
+            onClick={() => navigate('/contact')}
+            className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl text-center transition-all duration-300 hover:shadow-lg"
+          >
+            <FaEnvelope className="text-3xl mx-auto mb-3" />
+            <h3 className="text-lg font-semibold mb-2">Contact Us</h3>
+            <p className="text-green-100 text-sm">Get in touch for support</p>
+          </button>
         </div>
-      )}
+      </div>
+
+      {/* favorites section */}
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
+        <div className="flex justify-between items-center border-b pb-3 mb-6">
+          <h2 className="text-2xl font-bold text-blue-900">❤️ My Favorites</h2>
+          <div className="text-sm text-gray-500">
+            {state.favorites.length} {state.favorites.length === 1 ? 'property' : 'properties'} saved
+          </div>
+        </div>
+
+        {state.loading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-gray-500">Loading favorites...</p>
+          </div>
+        )}
+        
+        {state.error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-600">Error: {state.error}</p>
+          </div>
+        )}
+
+        {state.favorites.length === 0 && !state.loading ? (
+          <div className="text-center py-12">
+            <FaHeart className="text-6xl text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No favorites yet</h3>
+            <p className="text-gray-500 mb-6">Start exploring properties and add them to your favorites!</p>
+            <button
+              onClick={() => navigate('/properties')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+            >
+              Browse Properties
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {state.favorites.map((property) => (
+              <motion.div
+                key={property._id}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="relative h-48">
+                  <img
+                    src={property.image || property.images?.[0] || 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image'}
+                    alt={property.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/400x300/cccccc/666666?text=Property+Image';
+                    }}
+                  />
+                  <div className="absolute top-3 right-3">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      property.status === 'active' ? 'bg-green-100 text-green-800' : 
+                      property.status === 'sold' ? 'bg-red-100 text-red-800' : 
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {property.status || 'active'}
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                    {property.title}
+                  </h3>
+                  
+                  <div className="flex items-center text-gray-600 mb-3">
+                    <FaMapMarkerAlt className="mr-2 text-blue-500" />
+                    <span className="text-sm">{property.location}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-2xl font-bold text-blue-600">
+                      ₹{property.price.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-500 capitalize">
+                      {property.propertyType || 'Property'}
+                    </div>
+                  </div>
+                  
+                  {(property.bedrooms || property.bathrooms || property.area) && (
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                      {property.bedrooms && (
+                        <div className="flex items-center">
+                          <FaBed className="mr-1 text-blue-500" />
+                          <span>{property.bedrooms}</span>
+                        </div>
+                      )}
+                      {property.bathrooms && (
+                        <div className="flex items-center">
+                          <FaBath className="mr-1 text-blue-500" />
+                          <span>{property.bathrooms}</span>
+                        </div>
+                      )}
+                      {property.area && (
+                        <div className="flex items-center">
+                          <FaRulerCombined className="mr-1 text-blue-500" />
+                          <span>{property.area} sq ft</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {property.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => navigate(`/property/${property._id}`)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center"
+                    >
+                      <FaEye className="mr-2" />
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => handleRemoveFavorite(property._id)}
+                      className="text-red-500 hover:text-red-600 font-medium transition flex items-center p-2 rounded-full hover:bg-red-50"
+                      title="Remove from favorites"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
