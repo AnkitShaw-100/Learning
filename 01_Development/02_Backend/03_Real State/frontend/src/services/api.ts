@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://real-estate-78l9.vercel.app';
 
 // Type definitions
 interface ApiResponse<T = unknown> {
@@ -172,7 +172,7 @@ class ApiClient {
 
   // Authentication methods
   async register(userData: UserData): Promise<ApiResponse<User>> {
-    const response = await this.request<{ token: string; data: User }>('/auth/register', {
+    const response = await this.request<{ token: string; data: User }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
