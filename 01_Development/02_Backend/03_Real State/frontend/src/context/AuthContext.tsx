@@ -43,7 +43,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   const checkAuth = async () => {
@@ -51,13 +51,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         const response = await apiClient.getCurrentUser();
-        if (response.success && response.data) {
-          setUser(response.data);
+        if (response) {
+          setUser(response);
+          console.log("user set")
         } else {
+          console.log("removing after try")
           localStorage.removeItem('token');
           setUser(null);
         }
       } else {
+        console.log("removing after catch")
         setUser(null);
       }
     } catch (error) {

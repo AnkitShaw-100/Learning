@@ -101,11 +101,11 @@ const PropertyDetail: React.FC = () => {
   };
 
   const handleFavoriteToggle = async () => {
+    
     if (!user) {
-      navigate('/login');
+     
       return;
     }
-
     if (!property) return;
 
     setFavoriteLoading(true);

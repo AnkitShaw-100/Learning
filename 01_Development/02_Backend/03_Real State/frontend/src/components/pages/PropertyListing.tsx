@@ -123,7 +123,7 @@ const PropertyListing: React.FC = () => {
   const handleFavoriteToggle = async (propertyId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      // navigate('/login');
       return;
     }
 

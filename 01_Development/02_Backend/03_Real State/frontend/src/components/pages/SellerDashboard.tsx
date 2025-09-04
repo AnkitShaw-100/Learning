@@ -31,7 +31,7 @@ const SellerDashboard: React.FC = () => {
 
   useEffect(() => {
     if (!user || user.role !== 'seller') {
-      navigate('/login');
+      // navigate('/login');
       return;
     }
     fetchProperties();
@@ -297,7 +297,7 @@ const SellerDashboard: React.FC = () => {
           {/* Favorites Section */}
           <div className="bg-white rounded-lg shadow-md p-6 mt-8">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">❤️ My Favorites</h2>
+              <h2 className="text-xl font-semibold text-gray-800">My Favorites</h2>
               <p className="text-gray-600 text-sm">Properties you've marked as favorites</p>
             </div>
 

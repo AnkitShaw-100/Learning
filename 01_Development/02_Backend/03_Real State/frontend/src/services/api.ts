@@ -129,6 +129,7 @@ class ApiClient {
     if (token) {
       localStorage.setItem('token', token);
     } else {
+      console.log('removing...')
       localStorage.removeItem('token');
     }
   }
@@ -149,7 +150,11 @@ class ApiClient {
 
   // Generic request method
   async request<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+    // Ensure all requests have '/api' prefix
+    let apiEndpoint = endpoint.startsWith('/api') ? endpoint : endpoint.startsWith('/') ? `/api${endpoint}` : `/api/${endpoint}`;
+    // Avoid double /api/api
+    apiEndpoint = apiEndpoint.replace(/\/api\/api/g, '/api');
+    const url = `${this.baseURL}${apiEndpoint}`;
     const config: RequestInit = {
       headers: this.getHeaders(),
       ...options,
@@ -164,6 +169,10 @@ class ApiClient {
       }
 
       return data;
+      // return {
+      //   success: true,
+      //   data,
+      // };
     } catch (error) {
       console.error('API Error:', error);
       throw error;
@@ -189,7 +198,7 @@ class ApiClient {
   }
 
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await this.request<{ token: string; data?: User; user?: User } | (User & { token: string })>('/auth/login', {
+    const response = await this.request<{ token: string; data?: User; user?: User } | (User & { token: string })>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -348,7 +357,7 @@ class ApiClient {
   async createProperty(propertyData: PropertyData | FormData): Promise<ApiResponse> {
     // Handle both JSON and FormData (for file uploads)
     if (propertyData instanceof FormData) {
-      const endpoints = [`${this.baseURL}/properties`, `${this.baseURL}/listings`];
+      const endpoints = [`${this.baseURL}/api/properties`, `${this.baseURL}/api/listings`];
       for (const url of endpoints) {
         const config = {
           method: 'POST',
@@ -519,7 +528,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('image', file);
 
-    const url = `${this.baseURL}/upload`;
+    const url = `${this.baseURL}/api/upload`;
     const config = {
       method: 'POST',
       headers: {

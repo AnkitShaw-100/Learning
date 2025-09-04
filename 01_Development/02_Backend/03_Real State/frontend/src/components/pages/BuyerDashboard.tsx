@@ -153,7 +153,7 @@ const BuyerDashboard = () => {
   // auth + fetch
   useEffect(() => {
     if (!user || user.role !== "buyer") {
-      navigate("/login");
+      // navigate("/login");
     } else {
       fetchFavorites();
     }
@@ -168,7 +168,7 @@ const BuyerDashboard = () => {
       {/* profile card */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
         <div className="flex justify-between items-center border-b pb-3">
-          <h2 className="text-2xl font-bold text-blue-900">👤 My Profile</h2>
+          <h2 className="text-2xl font-bold text-blue-900">My Profile</h2>
           {editing ? (
             <div className="flex gap-3">
               <button
@@ -225,7 +225,7 @@ const BuyerDashboard = () => {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
-        <h2 className="text-2xl font-bold text-blue-900 mb-6">🚀 Quick Actions</h2>
+        <h2 className="text-2xl font-bold text-blue-900 mb-6"> Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <button
             onClick={() => navigate('/properties')}
@@ -259,7 +259,7 @@ const BuyerDashboard = () => {
       {/* favorites section */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-10 border border-gray-100">
         <div className="flex justify-between items-center border-b pb-3 mb-6">
-          <h2 className="text-2xl font-bold text-blue-900">❤️ My Favorites</h2>
+          <h2 className="text-2xl font-bold text-blue-900"> My Favorites</h2>
           <div className="text-sm text-gray-500">
             {state.favorites.length} {state.favorites.length === 1 ? 'property' : 'properties'} saved
           </div>

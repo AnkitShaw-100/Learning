@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaTimes, FaPlus } from "react-icons/fa";
@@ -128,16 +128,12 @@ const AddProperty: React.FC = () => {
   };
 
   // Block unauthorized access
-  if (!user || user.role !== 'seller') {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You need to be logged in as a seller to add properties.</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!user || user.role !== 'seller') {
+      console.log(user);
+      navigate('/access-denied');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
